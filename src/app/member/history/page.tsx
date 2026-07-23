@@ -2,19 +2,18 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { requireUser } from "@/lib/current-user";
 import { hoursHistoryForUser } from "@/lib/services/history-service";
-import { hoursEarnedForUser } from "@/lib/services/member-service";
+import { hoursBreakdownForUser } from "@/lib/services/member-service";
 import { getTotalGoal } from "@/lib/services/chapter-service";
-import { schoolYearRange } from "@/lib/hours";
+import { HOUR_CATEGORY_LABELS } from "@/lib/constants";
 import { formatEventDate } from "@/lib/format";
 
 export default async function MemberHistoryPage() {
   const user = await requireUser("member");
-  const [history, earned, goal] = await Promise.all([
+  const [history, breakdown, goal] = await Promise.all([
     hoursHistoryForUser(user.id),
-    hoursEarnedForUser(user.id),
+    hoursBreakdownForUser(user.id),
     getTotalGoal(),
   ]);
-  const { start, end } = schoolYearRange();
 
   return (
     <div className="space-y-6">
@@ -28,8 +27,8 @@ export default async function MemberHistoryPage() {
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-gray-900">Hours history</h1>
         <p className="text-sm text-gray-500">
-          {earned} of {goal} hours · school year {start.getUTCFullYear()}–
-          {end.getUTCFullYear()}
+          {breakdown.total} of {goal} hours · {breakdown.inside} inside ·{" "}
+          {breakdown.outside} outside ({breakdown.outsideCounted} counted)
         </p>
       </div>
 
@@ -43,6 +42,7 @@ export default async function MemberHistoryPage() {
                 <th className="px-5 py-3">Date</th>
                 <th className="px-5 py-3">Activity</th>
                 <th className="px-5 py-3">Type</th>
+                <th className="px-5 py-3">Category</th>
                 <th className="px-5 py-3 text-right">Hours</th>
               </tr>
             </thead>
@@ -53,6 +53,18 @@ export default async function MemberHistoryPage() {
                   <td className="px-5 py-3 font-medium text-gray-900">{e.source}</td>
                   <td className="px-5 py-3 text-gray-500">
                     {e.kind === "event" ? "Event" : "Reported"}
+                    <span
+                      className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                        e.origin === "outside"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {e.origin === "outside" ? "Outside" : "Inside"}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-gray-500">
+                    {HOUR_CATEGORY_LABELS[e.category]}
                   </td>
                   <td className="px-5 py-3 text-right font-medium text-gray-900">
                     {e.hours}

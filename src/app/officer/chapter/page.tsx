@@ -62,6 +62,61 @@ export default async function ChapterSettingsPage() {
             </p>
           </div>
           <div>
+            <label htmlFor="outsideHoursCap" className={label}>
+              Outside-hours cap
+            </label>
+            <input
+              id="outsideHoursCap"
+              name="outsideHoursCap"
+              type="number"
+              step="0.5"
+              min="0"
+              defaultValue={settings.outsideHoursCap}
+              required
+              className={field}
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Maximum hours from outside (non-NHS) volunteering that count toward
+              the goal.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="schoolYearEndMonth" className={label}>
+                School year ends — month
+              </label>
+              <input
+                id="schoolYearEndMonth"
+                name="schoolYearEndMonth"
+                type="number"
+                min="1"
+                max="12"
+                defaultValue={settings.schoolYearEndMonth}
+                required
+                className={field}
+              />
+            </div>
+            <div>
+              <label htmlFor="schoolYearEndDay" className={label}>
+                Day
+              </label>
+              <input
+                id="schoolYearEndDay"
+                name="schoolYearEndDay"
+                type="number"
+                min="1"
+                max="31"
+                defaultValue={settings.schoolYearEndDay}
+                required
+                className={field}
+              />
+            </div>
+            <p className="col-span-2 -mt-2 text-xs text-gray-500">
+              After this date, a &quot;deactivate graduated seniors&quot; button
+              appears on the members page.
+            </p>
+          </div>
+          <div>
             <label htmlFor="publicUrl" className={label}>
               Public site URL
             </label>

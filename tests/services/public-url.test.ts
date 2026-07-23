@@ -15,9 +15,12 @@ describe("getPublicBaseUrl", () => {
   it("uses the configured publicUrl and strips a trailing slash", async () => {
     await updateChapterSettings({
       chapterName: "Test Chapter",
-      totalHoursGoal: 10,
-      publicUrl: "https://trim.example.com/",
+      totalHoursGoal: 30,
+      outsideHoursCap: 14,
+      schoolYearEndMonth: 6,
+      schoolYearEndDay: 30,
+      publicUrl: "https://nhs.example.com/",
     });
-    expect(await getPublicBaseUrl()).toBe("https://trim.example.com");
+    expect(await getPublicBaseUrl()).toBe("https://nhs.example.com");
   });
 });

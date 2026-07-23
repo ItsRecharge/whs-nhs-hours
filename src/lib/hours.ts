@@ -1,14 +1,17 @@
-// Pure hours/progress logic, ported from the original Flask app/utils/hours.py.
-// All dates use UTC-midnight Date objects with date-only semantics.
+// Pure hours/progress logic. All dates use UTC-midnight Date objects with
+// date-only semantics.
 //
-// The yearly goal is configurable per chapter (ChapterSettings); the functions
-// here take an optional `goal` and fall back to DEFAULT_TOTAL_HOURS_GOAL so
-// callers without settings (and tests) keep working. Progress-color thresholds
-// scale to the goal (danger <30%, warning <70%, success >=70%).
+// NHS members complete a cumulative total over junior + senior year — progress
+// is NOT windowed to a school year. The goal and the outside-hours cap are
+// configurable per chapter (ChapterSettings); the functions here take an
+// optional `goal` and fall back to the defaults so callers without settings
+// (and tests) keep working. Progress-color thresholds scale to the goal
+// (danger <30%, warning <70%, success >=70%).
 
-export const DEFAULT_TOTAL_HOURS_GOAL = 10.0;
-/** @deprecated Use the configurable goal from ChapterSettings where possible. */
-export const TOTAL_HOURS_GOAL = DEFAULT_TOTAL_HOURS_GOAL;
+import type { HourCategory } from "./constants";
+
+export const DEFAULT_TOTAL_HOURS_GOAL = 30.0;
+export const DEFAULT_OUTSIDE_HOURS_CAP = 14.0;
 export const SCHOOL_YEAR_START_MONTH = 9; // September
 
 export type ProgressColor = "success" | "warning" | "danger";
@@ -42,6 +45,47 @@ export function schoolYearRange(today: Date = todayLocalDate()): {
     start: new Date(Date.UTC(startYear, 8, 1)),
     end: new Date(Date.UTC(startYear + 1, 7, 31)),
   };
+}
+
+/** Per-member hour totals split by origin and category. */
+export interface HoursBreakdown {
+  inside: number;
+  outside: number;
+  /** Outside hours that actually count toward the goal: min(outside, cap). */
+  outsideCounted: number;
+  /** inside + outsideCounted — the number compared against the goal. */
+  total: number;
+  byCategory: Record<HourCategory, number>;
+  requirements: { tutoring: boolean; soupKitchen: boolean; gardening: boolean };
+}
+
+/** Hours counted toward the goal: all inside hours + capped outside hours. */
+export function countedTotal(
+  inside: number,
+  outside: number,
+  cap: number = DEFAULT_OUTSIDE_HOURS_CAP,
+): number {
+  return inside + Math.min(outside, Math.max(0, cap));
+}
+
+/**
+ * The calendar year the current school year ends in (June side). In Sep–Dec
+ * that's next year; in Jan–Aug it's this year.
+ */
+export function currentSchoolYearEndYear(today: Date = todayLocalDate()): number {
+  const month = today.getUTCMonth() + 1;
+  return month >= SCHOOL_YEAR_START_MONTH
+    ? today.getUTCFullYear() + 1
+    : today.getUTCFullYear();
+}
+
+/** Graduation year implied by a grade picked at signup. */
+export function gradYearForGrade(
+  grade: "junior" | "senior",
+  today: Date = todayLocalDate(),
+): number {
+  const endYear = currentSchoolYearEndYear(today);
+  return grade === "senior" ? endYear : endYear + 1;
 }
 
 export function hoursRemaining(

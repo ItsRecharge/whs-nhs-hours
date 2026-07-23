@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  TOTAL_HOURS_GOAL,
+  DEFAULT_TOTAL_HOURS_GOAL,
+  DEFAULT_OUTSIDE_HOURS_CAP,
+  countedTotal,
+  currentSchoolYearEndYear,
+  gradYearForGrade,
   hoursRemaining,
   progressColor,
   progressPct,
@@ -43,39 +47,81 @@ describe("todayLocalDate", () => {
   });
 });
 
+describe("countedTotal", () => {
+  it("counts all inside hours plus outside up to the cap", () => {
+    expect(countedTotal(10, 5, 14)).toBe(15);
+  });
+
+  it("caps outside hours (15 outside → 14 counted)", () => {
+    expect(countedTotal(10, 15, 14)).toBe(24);
+  });
+
+  it("uses the default cap when omitted", () => {
+    expect(countedTotal(0, 100)).toBe(DEFAULT_OUTSIDE_HOURS_CAP);
+  });
+
+  it("treats a negative cap as zero", () => {
+    expect(countedTotal(5, 10, -1)).toBe(5);
+  });
+});
+
+describe("currentSchoolYearEndYear / gradYearForGrade", () => {
+  it("ends next calendar year during the fall", () => {
+    expect(currentSchoolYearEndYear(utc(2026, 9, 1))).toBe(2027);
+  });
+
+  it("ends this calendar year during the spring/summer", () => {
+    expect(currentSchoolYearEndYear(utc(2026, 8, 31))).toBe(2026);
+    expect(currentSchoolYearEndYear(utc(2026, 3, 15))).toBe(2026);
+  });
+
+  it("seniors graduate at the school-year end; juniors a year later", () => {
+    // Fall 2026 → school year ends 2027
+    expect(gradYearForGrade("senior", utc(2026, 10, 1))).toBe(2027);
+    expect(gradYearForGrade("junior", utc(2026, 10, 1))).toBe(2028);
+    // Spring 2027 (same school year)
+    expect(gradYearForGrade("senior", utc(2027, 3, 1))).toBe(2027);
+    expect(gradYearForGrade("junior", utc(2027, 3, 1))).toBe(2028);
+  });
+});
+
 describe("hoursRemaining", () => {
-  it("subtracts from the yearly goal", () => {
-    expect(hoursRemaining(3)).toBe(TOTAL_HOURS_GOAL - 3);
+  it("subtracts from the default total goal", () => {
+    expect(hoursRemaining(3)).toBe(DEFAULT_TOTAL_HOURS_GOAL - 3);
+  });
+
+  it("respects an explicit goal", () => {
+    expect(hoursRemaining(3, 10)).toBe(7);
   });
 
   it("never goes negative", () => {
-    expect(hoursRemaining(15)).toBe(0);
+    expect(hoursRemaining(45)).toBe(0);
   });
 });
 
 describe("progressColor", () => {
-  it("is danger below 3", () => {
-    expect(progressColor(0)).toBe("danger");
-    expect(progressColor(2.9)).toBe("danger");
+  it("is danger below 30% of the goal", () => {
+    expect(progressColor(0, 10)).toBe("danger");
+    expect(progressColor(2.9, 10)).toBe("danger");
   });
 
-  it("is warning from 3 to under 7", () => {
-    expect(progressColor(3)).toBe("warning");
-    expect(progressColor(6.9)).toBe("warning");
+  it("is warning from 30% to under 70%", () => {
+    expect(progressColor(3, 10)).toBe("warning");
+    expect(progressColor(6.9, 10)).toBe("warning");
   });
 
-  it("is success at 7 and above", () => {
-    expect(progressColor(7)).toBe("success");
-    expect(progressColor(12)).toBe("success");
+  it("is success at 70% and above", () => {
+    expect(progressColor(7, 10)).toBe("success");
+    expect(progressColor(12, 10)).toBe("success");
   });
 });
 
 describe("progressPct", () => {
   it("converts earned hours to a percentage of the goal", () => {
-    expect(progressPct(5)).toBe(50);
+    expect(progressPct(5, 10)).toBe(50);
   });
 
   it("caps at 100", () => {
-    expect(progressPct(25)).toBe(100);
+    expect(progressPct(25, 10)).toBe(100);
   });
 });

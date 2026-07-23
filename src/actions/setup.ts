@@ -65,6 +65,9 @@ export async function completeSetupAction(
   await updateChapterSettings({
     chapterName: data.chapterName,
     totalHoursGoal: data.totalHoursGoal,
+    outsideHoursCap: 14,
+    schoolYearEndMonth: 6,
+    schoolYearEndDay: 30,
     publicUrl: null,
   });
 

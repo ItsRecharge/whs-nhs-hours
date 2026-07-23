@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { db } from "../db";
 import { hashToken } from "../tokens";
+import { gradYearForGrade } from "../hours";
 import { hashPassword } from "./auth-service";
 import { issueAuthToken } from "./token-service";
 import type { Role } from "../constants";
@@ -9,20 +10,23 @@ export type SignupResult =
   | { ok: true; userId: number; email: string; firstName: string; verificationToken: string }
   | {
       ok: false;
-      reason: "invalid_invite" | "invite_exhausted" | "email_taken";
+      reason: "invalid_invite" | "invite_exhausted" | "email_taken" | "grade_required";
     };
 
 /**
  * Creates a user from an invite atomically: re-validates the invite and bumps
  * its useCount inside the same transaction as the user create, so concurrent
  * signups can't exceed maxUses. Returns a verification token to email.
+ *
+ * Member invites require a grade (junior/senior) which is stored as the
+ * computed graduation year; officer/organizer invites ignore it.
  */
 export async function signupWithInvite(params: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  graduationYear?: number;
+  grade?: "junior" | "senior";
   rawInviteToken: string;
 }): Promise<SignupResult> {
   const passwordHash = await hashPassword(params.password);
@@ -39,13 +43,19 @@ export async function signupWithInvite(params: {
         return { ok: false, reason: "invite_exhausted" } as const;
       }
 
+      const isMember = invite.role === "member";
+      if (isMember && !params.grade) {
+        return { ok: false, reason: "grade_required" } as const;
+      }
+
       const user = await tx.user.create({
         data: {
           firstName: params.firstName,
           lastName: params.lastName,
           email: params.email,
           passwordHash,
-          graduationYear: params.graduationYear ?? null,
+          graduationYear:
+            isMember && params.grade ? gradYearForGrade(params.grade) : null,
           role: invite.role as Role,
         },
       });

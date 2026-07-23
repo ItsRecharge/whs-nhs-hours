@@ -13,6 +13,9 @@ export async function updateChapterAction(formData: FormData): Promise<void> {
   const parsed = chapterSettingsSchema.safeParse({
     chapterName: formData.get("chapterName"),
     totalHoursGoal: formData.get("totalHoursGoal"),
+    outsideHoursCap: formData.get("outsideHoursCap"),
+    schoolYearEndMonth: formData.get("schoolYearEndMonth"),
+    schoolYearEndDay: formData.get("schoolYearEndDay"),
     publicUrl: formData.get("publicUrl") ?? "",
   });
   if (!parsed.success) {

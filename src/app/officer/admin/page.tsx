@@ -25,6 +25,9 @@ export default async function AdminPage() {
       <AdminModals
         chapterName={settings.chapterName}
         totalHoursGoal={settings.totalHoursGoal}
+        outsideHoursCap={settings.outsideHoursCap}
+        schoolYearEndMonth={settings.schoolYearEndMonth}
+        schoolYearEndDay={settings.schoolYearEndDay}
         integrationStatus={integrationStatus}
         emailTestTo={officer.email}
         auditLog={auditLog}

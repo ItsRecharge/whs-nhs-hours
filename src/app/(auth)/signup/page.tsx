@@ -55,7 +55,7 @@ export default async function SignupPage({
 
   return (
     <AuthShell title="Create your account" subtitle="You've been invited to the chapter.">
-      <SignupForm inviteToken={invite} />
+      <SignupForm inviteToken={invite} askGrade={validation.invite?.role === "member"} />
     </AuthShell>
   );
 }

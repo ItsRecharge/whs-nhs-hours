@@ -48,6 +48,9 @@ interface ResetStats {
 interface Props {
   chapterName: string;
   totalHoursGoal: number;
+  outsideHoursCap: number;
+  schoolYearEndMonth: number;
+  schoolYearEndDay: number;
   integrationStatus: IntegrationStatus;
   emailTestTo: string;
   auditLog: AuditEntry[];
@@ -130,6 +133,9 @@ function Modal({
 export function AdminModals({
   chapterName,
   totalHoursGoal,
+  outsideHoursCap,
+  schoolYearEndMonth,
+  schoolYearEndDay,
   integrationStatus,
   emailTestTo,
   auditLog,
@@ -172,7 +178,7 @@ export function AdminModals({
     {
       id: "reset" as const,
       title: "Year-end reset",
-      desc: "Remove all members and the year's activity. Officers are kept.",
+      desc: "Nuclear option: removes ALL members (juniors lose progress). Normal rollover is deactivating graduated seniors on the Members page.",
       icon: AlertTriangle,
       danger: true,
     },
@@ -264,6 +270,57 @@ export function AdminModals({
               <p className="mt-1 text-xs text-gray-500">
                 Progress bars turn yellow at 30% and green at 70% of this goal.
               </p>
+            </div>
+            <div>
+              <label htmlFor="outsideHoursCap" className={label}>
+                Outside-hours cap
+              </label>
+              <input
+                id="outsideHoursCap"
+                name="outsideHoursCap"
+                type="number"
+                step="0.5"
+                min="0"
+                defaultValue={outsideHoursCap}
+                required
+                className={field}
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Max hours from outside (non-NHS) volunteering that count toward the
+                goal.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="schoolYearEndMonth" className={label}>
+                  Year ends — month
+                </label>
+                <input
+                  id="schoolYearEndMonth"
+                  name="schoolYearEndMonth"
+                  type="number"
+                  min="1"
+                  max="12"
+                  defaultValue={schoolYearEndMonth}
+                  required
+                  className={field}
+                />
+              </div>
+              <div>
+                <label htmlFor="schoolYearEndDay" className={label}>
+                  Day
+                </label>
+                <input
+                  id="schoolYearEndDay"
+                  name="schoolYearEndDay"
+                  type="number"
+                  min="1"
+                  max="31"
+                  defaultValue={schoolYearEndDay}
+                  required
+                  className={field}
+                />
+              </div>
             </div>
             <SubmitButton pendingText="Saving…">Save Settings</SubmitButton>
           </form>

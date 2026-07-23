@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ROLES } from "./constants";
+import { HOUR_CATEGORIES, HOUR_ORIGINS, ROLES } from "./constants";
 
 export const emailSchema = z
   .string()
@@ -23,7 +23,9 @@ export const signupSchema = z.object({
   lastName: z.string().trim().max(50).default(""),
   email: emailSchema,
   password: passwordSchema,
-  graduationYear: graduationYearSchema,
+  // Members pick their grade; graduation year is computed server-side.
+  // Officer/organizer invites have no grade.
+  grade: z.enum(["junior", "senior"]).optional(),
   inviteToken: z.string().min(1, "Invite token is missing"),
 });
 
@@ -85,6 +87,7 @@ const baseEvent = {
   title: z.string().trim().min(1, "Title is required").max(120),
   description: z.string().trim().max(2000).optional(),
   location: z.string().trim().max(200).optional(),
+  category: z.enum(HOUR_CATEGORIES).default("general"),
 };
 
 /** Officer event creation: one or more timeslots. */
@@ -99,15 +102,28 @@ export const eventRequestSchema = z.object({
   slots: z.array(timeslotSchema).length(1, "A request has a single timeslot"),
 });
 
-export const hourReportSchema = z.object({
-  description: z.string().trim().min(1, "Describe what you did").max(200),
-  notes: z.string().trim().max(500).optional(),
-  date: dateOnly,
-  hoursRequested: z.coerce
-    .number()
-    .min(0.5, "At least 0.5 hours")
-    .max(24, "At most 24 hours"),
-});
+export const hourReportSchema = z
+  .object({
+    description: z.string().trim().min(1, "Describe what you did").max(200),
+    notes: z.string().trim().max(500).optional(),
+    date: dateOnly,
+    hoursRequested: z.coerce
+      .number()
+      .min(0.5, "At least 0.5 hours")
+      .max(24, "At most 24 hours"),
+    category: z.enum(HOUR_CATEGORIES).default("general"),
+    origin: z.enum(HOUR_ORIGINS).default("inside"),
+  })
+  .superRefine((r, ctx) => {
+    if (r.origin === "outside" && r.category === "gardening") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["category"],
+        message:
+          "Gardening hours are in-school only — they must come from NHS events.",
+      });
+    }
+  });
 
 export const inviteSchema = z.object({
   expiresInDays: z.coerce.number().int().min(1).max(365),
@@ -115,20 +131,31 @@ export const inviteSchema = z.object({
   role: z.enum(ROLES).default("member"),
 });
 
-export const chapterSettingsSchema = z.object({
-  chapterName: z.string().trim().min(1, "Chapter name is required").max(60),
-  totalHoursGoal: z.coerce
-    .number()
-    .positive("Goal must be positive")
-    .max(1000, "Goal is too large"),
-  // Public base URL for email links; blank falls back to APP_URL.
-  publicUrl: z
-    .string()
-    .trim()
-    .optional()
-    .transform((v) => (v ? v : null))
-    .pipe(z.string().url("Enter a valid URL (https://…)").nullable()),
-});
+export const chapterSettingsSchema = z
+  .object({
+    chapterName: z.string().trim().min(1, "Chapter name is required").max(60),
+    totalHoursGoal: z.coerce
+      .number()
+      .positive("Goal must be positive")
+      .max(1000, "Goal is too large"),
+    outsideHoursCap: z.coerce
+      .number()
+      .min(0, "Cap can't be negative")
+      .max(1000, "Cap is too large"),
+    schoolYearEndMonth: z.coerce.number().int().min(1).max(12),
+    schoolYearEndDay: z.coerce.number().int().min(1).max(31),
+    // Public base URL for email links; blank falls back to APP_URL.
+    publicUrl: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => (v ? v : null))
+      .pipe(z.string().url("Enter a valid URL (https://…)").nullable()),
+  })
+  .refine((s) => s.outsideHoursCap <= s.totalHoursGoal, {
+    message: "Outside-hours cap can't exceed the total goal",
+    path: ["outsideHoursCap"],
+  });
 
 export const setupSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),

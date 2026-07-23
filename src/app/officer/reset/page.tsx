@@ -24,6 +24,10 @@ export default async function YearEndResetPage() {
           Back to admin
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-gray-900">Year-end reset</h1>
+        <p className="text-sm text-gray-500">
+          Nuclear option. For the normal end-of-year rollover, deactivate graduated
+          seniors from the Members page instead.
+        </p>
       </div>
 
       <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
@@ -31,7 +35,10 @@ export default async function YearEndResetPage() {
         <div>
           <p className="font-semibold">This permanently deletes:</p>
           <ul className="mt-1 list-disc pl-5">
-            <li>{summary.members} members (officers are kept)</li>
+            <li>
+              {summary.members} members (officers are kept) — including juniors,
+              who lose their two-year progress
+            </li>
             <li>{summary.events} events &amp; {summary.signups} sign-ups</li>
             <li>{summary.reports} hour reports</li>
             <li>{summary.invites} invite links</li>

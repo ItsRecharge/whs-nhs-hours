@@ -25,7 +25,7 @@ export async function signupAction(
     lastName: formData.get("lastName") ?? "",
     email: formData.get("email"),
     password: formData.get("password"),
-    graduationYear: formData.get("graduationYear") ?? "",
+    grade: formData.get("grade") || undefined,
     inviteToken: formData.get("inviteToken"),
   });
   if (!parsed.success) {
@@ -37,14 +37,13 @@ export async function signupAction(
     return { error: "Too many sign-up attempts. Please try again later." };
   }
 
-  const { firstName, lastName, email, password, graduationYear, inviteToken } =
-    parsed.data;
+  const { firstName, lastName, email, password, grade, inviteToken } = parsed.data;
   const result = await signupWithInvite({
     firstName,
     lastName,
     email,
     password,
-    graduationYear,
+    grade,
     rawInviteToken: inviteToken,
   });
 
@@ -54,6 +53,8 @@ export async function signupAction(
         return { error: "An account with that email already exists. Try logging in." };
       case "invite_exhausted":
         return { error: "This invite link has reached its usage limit." };
+      case "grade_required":
+        return { error: "Select your grade (junior or senior)." };
       default:
         return { error: "This invite link is invalid or has expired." };
     }

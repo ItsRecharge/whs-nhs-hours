@@ -20,6 +20,9 @@ export async function getTotalGoal(): Promise<number> {
 export async function updateChapterSettings(input: {
   chapterName: string;
   totalHoursGoal: number;
+  outsideHoursCap: number;
+  schoolYearEndMonth: number;
+  schoolYearEndDay: number;
   publicUrl: string | null;
 }): Promise<ChapterSettings> {
   return db.chapterSettings.upsert({

@@ -5,7 +5,13 @@ import { signupAction, type SignupFormState } from "@/actions/signup";
 import { SubmitButton } from "@/components/SubmitButton";
 import { fieldClass, labelClass } from "@/components/AuthShell";
 
-export function SignupForm({ inviteToken }: { inviteToken: string }) {
+export function SignupForm({
+  inviteToken,
+  askGrade,
+}: {
+  inviteToken: string;
+  askGrade: boolean;
+}) {
   const [state, formAction] = useActionState<SignupFormState, FormData>(signupAction, {});
 
   return (
@@ -37,20 +43,24 @@ export function SignupForm({ inviteToken }: { inviteToken: string }) {
         </label>
         <input id="email" name="email" type="email" required className={fieldClass} />
       </div>
-      <div>
-        <label htmlFor="graduationYear" className={labelClass}>
-          Graduation year <span className="text-gray-400">(optional)</span>
-        </label>
-        <input
-          id="graduationYear"
-          name="graduationYear"
-          type="number"
-          min="1980"
-          max="2100"
-          placeholder="e.g. 2027"
-          className={fieldClass}
-        />
-      </div>
+      {askGrade && (
+        <div>
+          <span className={labelClass}>Grade</span>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 has-[:checked]:border-blue-700 has-[:checked]:ring-2 has-[:checked]:ring-blue-200">
+              <input type="radio" name="grade" value="junior" required />
+              Junior
+            </label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 has-[:checked]:border-blue-700 has-[:checked]:ring-2 has-[:checked]:ring-blue-200">
+              <input type="radio" name="grade" value="senior" required />
+              Senior
+            </label>
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Sets your class year so your progress carries across both years.
+          </p>
+        </div>
+      )}
       <div>
         <label htmlFor="password" className={labelClass}>
           Password
