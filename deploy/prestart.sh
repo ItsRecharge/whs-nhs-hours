@@ -18,8 +18,11 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
-# $HOME is read-only in the sandbox; keep npm's cache inside the project dir.
+# $HOME is read-only in the sandbox; keep npm's and Prisma's caches inside the
+# project dir, and disable Prisma's checkpoint telemetry (writes ~/.cache/prisma).
 export npm_config_cache="$PROJECT_DIR/.npm-cache"
+export XDG_CACHE_HOME="$PROJECT_DIR/.cache"
+export CHECKPOINT_DISABLE=1
 
 mkdir -p data uploads  # SQLite DB + markers / proof-photo storage
 
