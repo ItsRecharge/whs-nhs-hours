@@ -20,6 +20,9 @@ data/*.db-shm
 # google service account credentials
 google_service/
 
+# claude code local config
+.claude/
+
 # misc
 .DS_Store
 coverage/
