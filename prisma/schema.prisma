@@ -1,0 +1,246 @@
+// SQLite for local dev. To move to Postgres: change provider, set DATABASE_URL,
+// and convert the String role/status/type columns to native enums.
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  firstName       String
+  lastName        String
+  email           String    @unique // stored lowercased
+  pendingEmail    String? // requested new email, awaiting verification
+  passwordHash    String
+  role            String    @default("member") // "member" | "officer" | "organizer"
+  isBootstrapOfficer Boolean @default(false)
+  graduationYear  Int? // class year; required for members via validation, null for officers/organizers
+  houseId         Int? // null until an officer assigns a house
+  deactivatedAt   DateTime? // set when an officer removes a member; blocks login
+  emailVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+
+  house           House?        @relation(fields: [houseId], references: [id])
+  signups         EventSignup[] @relation("UserSignups")
+  markedSignups   EventSignup[] @relation("MarkedBy")
+  createdEvents   Event[]       @relation("CreatedBy")
+  approvedEvents  Event[]       @relation("ApprovedBy")
+  invitesCreated  InviteToken[]
+  authTokens      AuthToken[]
+  sessions        Session[]
+  hourReports     HourReport[]  @relation("ReportOwner")
+  reviewedReports HourReport[]  @relation("ReportReviewer")
+  domainDismissals DomainReminderDismissal[]
+  shareLinksCreated ShareLink[]
+  organizerEvents OrganizerEvent[]
+}
+
+// The chapter's four houses. Seeded as "House 1".."House 4"; names editable.
+model House {
+  id        Int    @id @default(autoincrement())
+  name      String
+  sortOrder Int    @default(0)
+
+  members User[]
+}
+
+model Event {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?
+  location     String?
+  status       String   @default("active") // "active" | "completed" | "pending_approval" | "cancelled"
+  category     String   @default("general") // "general" | "tutoring" | "soup_kitchen" | "gardening"
+  createdById  Int
+  approvedById Int?
+  createdAt    DateTime @default(now())
+
+  createdBy  User       @relation("CreatedBy", fields: [createdById], references: [id])
+  approvedBy User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
+  timeslots  Timeslot[]
+  shareLinks ShareLink[]
+  organizers OrganizerEvent[]
+
+  @@index([status])
+}
+
+model Timeslot {
+  id          Int       @id @default(autoincrement())
+  eventId     Int
+  date        DateTime // UTC midnight; date-only semantics
+  startTime   String // "HH:MM" 24h, display only
+  endTime     String // "HH:MM" 24h, display only
+  hoursValue  Float     @default(1.0)
+  quota       Int // volunteers needed (confirmed cap)
+  completedAt DateTime? // set when an officer takes attendance for this slot
+
+  event   Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  signups EventSignup[]
+
+  @@index([eventId])
+  @@index([date])
+}
+
+model EventSignup {
+  id         Int      @id @default(autoincrement())
+  timeslotId Int
+  userId     Int
+  status     String   @default("confirmed") // "confirmed" | "waitlisted"
+  signedUpAt DateTime @default(now())
+  attended   Boolean  @default(false)
+  markedById Int?
+
+  timeslot Timeslot @relation(fields: [timeslotId], references: [id], onDelete: Cascade)
+  user     User     @relation("UserSignups", fields: [userId], references: [id])
+  markedBy User?    @relation("MarkedBy", fields: [markedById], references: [id])
+
+  @@unique([timeslotId, userId])
+}
+
+model HourReport {
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  description    String
+  notes          String?
+  date           DateTime // UTC midnight; the activity date
+  hoursRequested Float
+  category       String    @default("general") // "general" | "tutoring" | "soup_kitchen" | "gardening"
+  origin         String    @default("inside") // "inside" (NHS-organized) | "outside" (self-arranged)
+  photoPath      String? // proof photo, relative path under the uploads dir
+  status         String    @default("pending") // "pending" | "approved" | "denied"
+  reviewedById   Int?
+  reviewedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  user       User  @relation("ReportOwner", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User? @relation("ReportReviewer", fields: [reviewedById], references: [id])
+
+  @@index([status])
+  @@index([userId])
+}
+
+model InviteToken {
+  id          Int       @id @default(autoincrement())
+  tokenHash   String    @unique // sha256 of the raw token; raw is shown once
+  createdById Int
+  role        String    @default("member") // role granted on signup
+  expiresAt   DateTime
+  maxUses     Int? // null = unlimited until expiry
+  useCount    Int       @default(0)
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  createdBy User @relation(fields: [createdById], references: [id])
+}
+
+model AuthToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  type      String // "email_verification" | "password_reset"
+  tokenHash String    @unique
+  expiresAt DateTime // verification: 48h, reset: 1h
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+model ChapterSettings {
+  id              Int      @id @default(1) // singleton row
+  chapterName     String   @default("NHS Chapter")
+  totalHoursGoal  Float    @default(30.0) // total hours over the full (2-year) membership
+  outsideHoursCap Float    @default(14.0) // max outside hours that count toward the goal
+  schoolYearEndMonth Int   @default(6) // month the school year ends (senior-deactivation cutoff)
+  schoolYearEndDay   Int   @default(30)
+  publicUrl       String? // public base URL used in email links; falls back to APP_URL
+  domainReminderSentYear Int? // last Sept-15 cycle year the domain-renewal email was sent
+  updatedAt       DateTime @updatedAt
+}
+
+// Tokenized public links for outside organizers (no account required).
+model ShareLink {
+  id             Int       @id @default(autoincrement())
+  tokenHash      String    @unique // sha256 of the raw token; raw is shown once
+  kind           String // "roster" | "attendance"
+  eventId        Int? // required when kind = "attendance"
+  organizerName  String
+  organizerEmail String?
+  createdById    Int
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  event     Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdBy User   @relation(fields: [createdById], references: [id])
+
+  @@index([kind])
+}
+
+// Links organizer-role accounts to the events they partner on.
+model OrganizerEvent {
+  id          Int @id @default(autoincrement())
+  organizerId Int
+  eventId     Int
+
+  organizer User  @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  event     Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([organizerId, eventId])
+}
+
+model DomainReminderDismissal {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  year        Int      // calendar year of the Sept-15 cycle
+  dismissedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year])
+}
+
+model IntegrationSettings {
+  id                  Int      @id @default(1) // singleton row
+  gmailUser           String?
+  gmailAppPasswordEnc String? // AES-GCM ciphertext
+  sheetsSpreadsheetId String?
+  sheetsServiceEmail  String?
+  sheetsPrivateKeyEnc String? // AES-GCM ciphertext
+  sheetsRosterTab     String? // tab for the live roster snapshot (default "Roster")
+  sheetsLogTab        String? // tab for the append-only event log (default "Log")
+  updatedAt           DateTime @updatedAt
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actorId    Int // officer's user id (no FK so it survives deletion)
+  actorName  String // denormalized name snapshot
+  action     String // e.g. "event.create", "roster.deactivate"
+  summary    String // human-readable
+  targetType String?
+  targetId   Int?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     Int
+  tokenHash  String    @unique // sha256 of the random session secret in the cookie
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  userAgent  String?
+  lastUsedAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

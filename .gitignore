@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# database
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+
+# env
+.env
+.env.local
+.env*.local
+
+# google service account credentials
+google_service/
+
+# misc
+.DS_Store
+coverage/
+*.tsbuildinfo
+tests/.tmp/
+
+# uploads (hour-report proof photos)
+uploads/

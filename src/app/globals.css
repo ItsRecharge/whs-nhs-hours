@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+body {
+  background-color: #f5f7f9;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* NHS navy-to-blue gradient used by the landing hero and auth pages */
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    #0d2c6b 0%,
+    #123a85 40%,
+    #1d4fa3 70%,
+    #3a6fc4 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-gradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(0, 0, 0, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+a.glass-card {
+  transition:
+    background 0.18s,
+    transform 0.18s,
+    box-shadow 0.18s;
+}
+
+a.glass-card:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.deco-note {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.05);
+  user-select: none;
+  pointer-events: none;
+}
