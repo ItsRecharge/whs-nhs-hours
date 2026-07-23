@@ -101,7 +101,7 @@ export async function setRoleAction(formData: FormData): Promise<void> {
 
   // Promotions/demotions are a bootstrap-officer power.
   if (!officer.isBootstrapOfficer) {
-    await setFlash("warning", "Only the bootstrap officer can change roles.");
+    await setFlash("warning", "Only the admin can change roles.");
     redirect(memberPath(userId));
   }
   if (userId === officer.id) {

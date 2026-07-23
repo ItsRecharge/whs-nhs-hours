@@ -1,6 +1,8 @@
 [Unit]
 Description=WHS NHS Hours (Next.js)
-After=network.target
+# network-online (not just network): prestart.sh does a git pull at boot.
+Wants=network-online.target
+After=network-online.target
 # If startup (build) fails 3x within 10 min, stop retrying instead of rebuild-looping.
 StartLimitIntervalSec=600
 StartLimitBurst=3
@@ -12,22 +14,24 @@ Group=musicserver
 WorkingDirectory=/home/musicserver/whs-nhs-hours
 EnvironmentFile=/home/musicserver/whs-nhs-hours/.env
 Environment=NODE_ENV=production
-Environment=PORT=3000
+# 3001: the Tri-M app on this box already owns 3000.
+Environment=PORT=3001
 Environment=HOSTNAME=127.0.0.1
 # If Node is installed via nvm, include its bin path.
 Environment=PATH=/home/musicserver/.nvm/versions/node/v24.17.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 
-# Deploy flow: `git pull` (then `npm ci` if deps changed) and restart the service.
-# prestart.sh applies migrations and rebuilds ONLY when HEAD changed since the last
-# build (otherwise it reuses the old .next, so an unchanged restart is fast).
+# Deploy flow: just restart the service. prestart.sh pulls the latest code,
+# runs `npm ci` when the lockfile changed, applies migrations, and rebuilds ONLY
+# when HEAD changed since the last build (otherwise it reuses the old .next, so
+# an unchanged restart is fast).
 ExecStartPre=/usr/bin/env bash deploy/prestart.sh
 ExecStart=/usr/bin/env npm run start
 Restart=always
 RestartSec=5
 KillSignal=SIGINT
 TimeoutStopSec=30
-# The build runs during startup; give it room on a small box.
-TimeoutStartSec=300
+# Startup may pull + npm ci + build; give it room on a small box.
+TimeoutStartSec=600
 
 # Hardening
 NoNewPrivileges=true

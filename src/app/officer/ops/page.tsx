@@ -72,7 +72,7 @@ export default async function OpsPage({
             File editor and git control
           </h1>
           <p className="mt-1 text-sm text-gray-600">
-            Bootstrap-admin only. Confined to the project root.
+            Admin only. Confined to the project root.
           </p>
         </div>
 

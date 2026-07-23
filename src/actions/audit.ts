@@ -12,7 +12,7 @@ const AUDIT_PATH = "/officer/admin";
 export async function clearAuditLogAction(): Promise<void> {
   const me = await requireUser("officer");
   if (!me.isBootstrapOfficer) {
-    await setFlash("danger", "Only the bootstrap officer can clear the audit log.");
+    await setFlash("danger", "Only the admin can clear the audit log.");
     redirect(AUDIT_PATH);
   }
 

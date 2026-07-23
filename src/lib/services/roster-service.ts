@@ -33,7 +33,7 @@ export async function listOfficers(): Promise<OfficerRow[]> {
 
 export class BootstrapOfficerProtectionError extends Error {
   constructor() {
-    super("The bootstrap officer cannot be changed during the first year.");
+    super("The admin cannot be changed during the first year.");
     this.name = "BootstrapOfficerProtectionError";
   }
 }

@@ -68,7 +68,7 @@ export default async function MemberDetailPage({
           {memberHouse ? memberHouse.name : "No house"} ·{" "}
           <span className="capitalize">{member.role}</span>
           {member.deactivatedAt ? " · inactive" : ""}
-          {bootstrapProtected ? " · bootstrap admin" : ""}
+          {bootstrapProtected ? " · admin" : ""}
         </p>
       </div>
 
@@ -198,7 +198,7 @@ export default async function MemberDetailPage({
           <h2 className="mb-4 text-lg font-semibold text-gray-900">Manage</h2>
           {bootstrapProtected ? (
             <p className="mb-4 text-sm text-amber-700">
-              This is the bootstrap officer account. Transfer the bootstrap role to
+              This is the admin account. Transfer the admin role to
               another officer before it can be demoted or removed.
             </p>
           ) : null}
@@ -245,7 +245,7 @@ export default async function MemberDetailPage({
 
       {officer.isBootstrapOfficer && (
         <section className="rounded-xl border border-primary-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Bootstrap admin — edit user</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Admin — edit user</h2>
           <p className="mb-4 text-sm text-gray-500">
             Change this user&apos;s details directly, no links needed. Changing the
             email or password logs them out of all devices.

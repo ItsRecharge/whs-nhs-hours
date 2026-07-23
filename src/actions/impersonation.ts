@@ -28,7 +28,7 @@ function homeFor(role: string): string {
 export async function startImpersonationAction(formData: FormData): Promise<void> {
   const admin = await requireUser("officer");
   if (!admin.isBootstrapOfficer) {
-    await setFlash("danger", "Only the bootstrap officer can impersonate users.");
+    await setFlash("danger", "Only the admin can impersonate users.");
     redirect(OFFICERS_PATH);
   }
 

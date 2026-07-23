@@ -52,7 +52,7 @@ Hours Log and adapted to NHS rules.
 npm install
 cp .env.example .env          # then fill in the values below
 npx prisma migrate dev        # create the SQLite database (seeds 4 houses)
-npm run db:seed               # create the bootstrap officer (+ demo data if enabled)
+npm run db:seed               # create the admin account (+ demo data if enabled)
 npm run dev                   # http://localhost:3000
 ```
 
@@ -62,7 +62,7 @@ npm run dev                   # http://localhost:3000
 - `SESSION_SECRET` — `openssl rand -base64 32`
 - `APP_URL` — base URL used in email links (`http://localhost:3000` for dev)
 - `BOOTSTRAP_OFFICER_EMAIL` / `BOOTSTRAP_OFFICER_PASSWORD` / `BOOTSTRAP_OFFICER_NAME`
-  — the first officer, created pre-verified by the seed script
+  — the admin (first officer), created pre-verified by the seed script
 - `SEED_DEMO=true` — also seeds demo events + a demo member (local only)
 - `UPLOAD_DIR` (optional) — where proof photos are stored; defaults to
   `<repo>/uploads`. Served only through the authenticated `/api/uploads` route.
@@ -87,7 +87,7 @@ broadcasts are sent BCC in chunks to stay within it.
 
 ## First run
 
-1. Log in with the bootstrap officer account (or complete the setup wizard).
+1. Log in with the admin account (or complete the setup wizard).
 2. Go to **Invites** → create an invite link (Member, Officer, or Organizer).
 3. Members pick Junior/Senior at signup → verify email → log in.
 4. Officers assign houses, create typed events, approve hour reports (with proof

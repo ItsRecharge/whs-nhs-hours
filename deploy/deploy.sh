@@ -5,12 +5,12 @@
 # Run as the service user (musicserver) from anywhere:
 #   ./deploy/deploy.sh
 #
-# On restart the systemd unit runs deploy/prestart.sh, which applies migrations and
-# rebuilds only when HEAD changed since the last build. So a deploy is just: get the
-# new code (and deps) onto disk, then restart. This script does exactly that.
-#
-# Code-only change? You can skip this script and just run:
-#   git pull && sudo systemctl restart whs-nhs-hours
+# On restart the systemd unit runs deploy/prestart.sh, which now pulls the latest
+# code itself, runs `npm ci` when the lockfile changed, applies migrations, and
+# rebuilds only when HEAD changed since the last build. So a deploy is simply:
+#   sudo systemctl restart whs-nhs-hours
+# This script is a convenience wrapper that does the pull/install up front (with
+# visible output, outside the service sandbox) and then restarts.
 #
 # Troubleshooting — Ops Console "git pull" fails with:
 #   error: insufficient permission for adding an object to repository database .git/objects

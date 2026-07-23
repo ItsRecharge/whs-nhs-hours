@@ -134,7 +134,7 @@ export async function setOfficerActiveAction(formData: FormData): Promise<void> 
 export async function transferBootstrapAction(formData: FormData): Promise<void> {
   const officer = await requireUser("officer");
   if (!officer.isBootstrapOfficer) {
-    await setFlash("danger", "Only the bootstrap officer can transfer the role.");
+    await setFlash("danger", "Only the admin can transfer the role.");
     redirect(OFFICERS_PATH);
   }
 
@@ -148,7 +148,7 @@ export async function transferBootstrapAction(formData: FormData): Promise<void>
 
   const target = await db.user.findUnique({ where: { id: targetId } });
   if (!target || target.role !== "officer" || target.deactivatedAt || target.id === officer.id) {
-    await setFlash("warning", "Pick an active officer to receive the bootstrap role.");
+    await setFlash("warning", "Pick an active officer to receive the admin role.");
     redirect(OFFICERS_PATH);
   }
 
@@ -160,11 +160,11 @@ export async function transferBootstrapAction(formData: FormData): Promise<void>
   await recordAudit({
     actor: officer,
     action: "bootstrap.transfer",
-    summary: `Transferred the bootstrap role to ${fullName(target)}`,
+    summary: `Transferred the admin role to ${fullName(target)}`,
     targetType: "user",
     targetId: target.id,
   });
-  await setFlash("success", `${target.firstName} is now the bootstrap officer.`);
+  await setFlash("success", `${target.firstName} is now the admin.`);
   revalidatePath(OFFICERS_PATH);
   redirect(OFFICERS_PATH);
 }

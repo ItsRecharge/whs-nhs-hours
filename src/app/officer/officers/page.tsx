@@ -30,7 +30,7 @@ export default async function OfficersPage() {
         <h1 className="mt-2 text-2xl font-bold text-gray-900">Officers</h1>
         <p className="text-sm text-gray-500">
           Everyone with officer access. Reset a password or remove an officer as the
-          roster changes. The bootstrap officer is protected from removal until the
+          roster changes. The admin is protected from removal until the
           role is handed off.
         </p>
       </div>
@@ -41,10 +41,10 @@ export default async function OfficersPage() {
         <div className="rounded-xl border border-primary-200 bg-primary-50/60 p-5">
           <div className="mb-1 flex items-center gap-2 font-semibold text-gray-900">
             <Crown className="h-4 w-4 text-primary-800" />
-            Transfer bootstrap role
+            Transfer admin role
           </div>
           <p className="mb-4 text-sm text-gray-600">
-            Hand the bootstrap (master admin) role to another officer. They become
+            Hand the admin role to another officer. They become
             protected from removal; you no longer will be. Confirm with your password.
           </p>
           <form
@@ -53,7 +53,7 @@ export default async function OfficersPage() {
           >
             <div className="flex-1">
               <label htmlFor="targetId" className="mb-1 block text-xs font-medium text-gray-700">
-                New bootstrap officer
+                New admin
               </label>
               <select
                 id="targetId"
@@ -121,7 +121,7 @@ export default async function OfficersPage() {
                       )}
                       {o.isBootstrapOfficer ? (
                         <span className="flex items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-800">
-                          <ShieldCheck className="h-3 w-3" /> Bootstrap
+                          <ShieldCheck className="h-3 w-3" /> Admin
                         </span>
                       ) : null}
                     </div>

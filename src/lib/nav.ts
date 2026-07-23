@@ -19,7 +19,7 @@ export interface NavItem {
 export const MEMBER_NAV: NavItem[] = [
   { href: "/member/dashboard", label: "Dashboard", short: "Home", icon: LayoutDashboard },
   { href: "/member/events", label: "Events", short: "Events", icon: Calendar },
-  { href: "/member/report-hours", label: "Report Hours", short: "Report", icon: Clock },
+  { href: "/member/report-hours", label: "Manually Report Hours", short: "Report", icon: Clock },
   {
     href: "/member/request-event",
     label: "Request Event",

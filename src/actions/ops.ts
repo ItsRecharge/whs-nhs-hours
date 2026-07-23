@@ -53,7 +53,7 @@ export async function requestOpsGrantAction(formData: FormData): Promise<void> {
   // current user.
   const bootstrap = await getBootstrapOfficer();
   if (!bootstrap || !(await verifyPassword(bootstrap.passwordHash, password))) {
-    await setFlash("danger", "That is not the bootstrap officer's password.");
+    await setFlash("danger", "That is not the admin's password.");
     redirect("/officer/ops");
   }
 

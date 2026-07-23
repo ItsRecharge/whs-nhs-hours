@@ -19,7 +19,7 @@ function memberPath(id: number) {
 async function requireBootstrap(redirectTo: string) {
   const officer = await requireUser("officer");
   if (!officer.isBootstrapOfficer) {
-    await setFlash("danger", "Only the bootstrap officer can edit user data directly.");
+    await setFlash("danger", "Only the admin can edit user data directly.");
     redirect(redirectTo);
   }
   return officer;
