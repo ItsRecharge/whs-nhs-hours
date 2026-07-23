@@ -28,7 +28,7 @@ export default async function SignupPage({
         </p>
         <Link
           href="/login"
-          className="mt-4 inline-block text-sm font-medium text-indigo-700 hover:underline"
+          className="mt-4 inline-block text-sm font-medium text-blue-800 hover:underline"
         >
           Already have an account? Log in
         </Link>
@@ -45,7 +45,7 @@ export default async function SignupPage({
         </p>
         <Link
           href="/login"
-          className="mt-4 inline-block text-sm font-medium text-indigo-700 hover:underline"
+          className="mt-4 inline-block text-sm font-medium text-blue-800 hover:underline"
         >
           Back to login
         </Link>

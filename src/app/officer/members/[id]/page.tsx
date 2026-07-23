@@ -26,7 +26,7 @@ import { startImpersonationAction } from "@/actions/impersonation";
 import { formatEventDate } from "@/lib/format";
 
 const field =
-  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
+  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
 export default async function MemberDetailPage({
@@ -56,7 +56,7 @@ export default async function MemberDetailPage({
       <div>
         <Link
           href="/officer/members"
-          className="flex items-center gap-1.5 text-sm text-indigo-700 hover:underline"
+          className="flex items-center gap-1.5 text-sm text-blue-800 hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to roster
@@ -244,7 +244,7 @@ export default async function MemberDetailPage({
       )}
 
       {officer.isBootstrapOfficer && (
-        <section className="rounded-xl border border-indigo-200 bg-white p-6 shadow-sm">
+        <section className="rounded-xl border border-blue-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900">Bootstrap admin — edit user</h2>
           <p className="mb-4 text-sm text-gray-500">
             Change this user&apos;s details directly, no links needed. Changing the

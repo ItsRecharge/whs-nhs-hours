@@ -61,7 +61,7 @@ interface Props {
 }
 
 const field =
-  "w-full rounded-2xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
+  "w-full rounded-2xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
 function formatWhen(d: Date): string {
@@ -193,7 +193,7 @@ export function AdminModals({
     <>
       <div className="grid gap-4 sm:grid-cols-2">
         <Link href="/officer/officers" className={cardClass}>
-          <Users className="mt-0.5 h-5 w-5 shrink-0 text-indigo-700" />
+          <Users className="mt-0.5 h-5 w-5 shrink-0 text-blue-800" />
           <div>
             <p className="font-semibold text-gray-900">Officers</p>
             <p className="mt-0.5 text-sm text-gray-500">
@@ -210,7 +210,7 @@ export function AdminModals({
             className={`${cardClass} ${c.danger ? "ring-1 ring-red-100" : ""}`}
           >
             <c.icon
-              className={`mt-0.5 h-5 w-5 shrink-0 ${c.danger ? "text-red-600" : "text-indigo-700"}`}
+              className={`mt-0.5 h-5 w-5 shrink-0 ${c.danger ? "text-red-600" : "text-blue-800"}`}
             />
             <div>
               <p className="font-semibold text-gray-900">{c.title}</p>
@@ -224,7 +224,7 @@ export function AdminModals({
             href="/officer/ops"
             className="flex items-start gap-3 rounded-2xl bg-white p-5 shadow-sm transition hover:shadow-md"
           >
-            <Settings className="mt-0.5 h-5 w-5 shrink-0 text-indigo-700" />
+            <Settings className="mt-0.5 h-5 w-5 shrink-0 text-blue-800" />
             <div>
               <p className="font-semibold text-gray-900">Operations console</p>
               <p className="mt-0.5 text-sm text-gray-500">

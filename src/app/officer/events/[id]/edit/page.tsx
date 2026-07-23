@@ -16,7 +16,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { HOUR_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
 
 const field =
-  "w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
+  "w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
 export default async function EditEventPage({
@@ -46,7 +46,7 @@ export default async function EditEventPage({
       <div>
         <Link
           href="/officer/events"
-          className="flex items-center gap-1.5 text-sm text-indigo-700 hover:underline"
+          className="flex items-center gap-1.5 text-sm text-blue-800 hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to events

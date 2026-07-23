@@ -188,7 +188,7 @@ export default async function MemberDashboard() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-indigo-700">
+                  <p className="text-sm font-medium text-blue-800">
                     {s.timeslot.hoursValue} hrs
                   </p>
                   {s.status === "waitlisted" && (

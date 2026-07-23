@@ -16,7 +16,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className={`cursor-pointer rounded-md bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-800 disabled:cursor-default disabled:opacity-60 ${className}`}
+      className={`cursor-pointer rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:cursor-default disabled:opacity-60 ${className}`}
     >
       {pending ? pendingText : children}
     </button>

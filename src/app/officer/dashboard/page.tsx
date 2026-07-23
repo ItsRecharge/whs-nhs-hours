@@ -57,7 +57,7 @@ export default async function OfficerDashboard() {
       sub: `${active.length} active`,
       icon: Users,
       href: "/officer/members",
-      accent: "text-indigo-700",
+      accent: "text-blue-800",
     },
     {
       label: "Goal met",
@@ -122,7 +122,7 @@ export default async function OfficerDashboard() {
           </form>
           <Link
             href="/officer/admin"
-            className="flex items-center gap-1.5 text-sm font-medium text-indigo-700 hover:underline"
+            className="flex items-center gap-1.5 text-sm font-medium text-blue-800 hover:underline"
           >
             <Settings className="h-4 w-4" />
             Admin
@@ -178,7 +178,7 @@ export default async function OfficerDashboard() {
                   <td className="px-5 py-3">
                     <Link
                       href={`/officer/members/${m.id}`}
-                      className="font-medium text-gray-900 hover:text-indigo-700 hover:underline"
+                      className="font-medium text-gray-900 hover:text-blue-800 hover:underline"
                     >
                       {m.firstName} {m.lastName}
                     </Link>

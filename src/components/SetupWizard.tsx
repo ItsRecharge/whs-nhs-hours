@@ -92,7 +92,7 @@ export function SetupWizard() {
       </div>
       <div className="mb-6 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
         <div
-          className="h-full rounded-full bg-indigo-600 transition-all"
+          className="h-full rounded-full bg-blue-700 transition-all"
           style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
         />
       </div>
@@ -257,7 +257,7 @@ export function SetupWizard() {
                 href="https://myaccount.google.com/apppasswords"
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-700 hover:underline"
+                className="text-blue-800 hover:underline"
               >
                 app password
               </a>
@@ -338,7 +338,7 @@ export function SetupWizard() {
             <button
               type="button"
               onClick={next}
-              className="rounded-md bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-800"
+              className="rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
             >
               Continue
             </button>

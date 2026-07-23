@@ -45,7 +45,7 @@ export function DomainRenewalPopup({
       >
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-gray-100 px-6 pb-4 pt-5">
           <div className="flex items-center gap-3">
-            <span className="rounded-full bg-indigo-100 p-2 text-indigo-700">
+            <span className="rounded-full bg-blue-100 p-2 text-blue-800">
               <Globe className="h-5 w-5" />
             </span>
             <div>
@@ -79,7 +79,7 @@ export function DomainRenewalPopup({
               href={renewalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-800"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
             >
               <Globe className="h-4 w-4" />
               Open Cloudflare

@@ -7,7 +7,7 @@ export default function NotFound() {
       <p className="mt-2 text-sm text-gray-500">This page could not be found.</p>
       <Link
         href="/"
-        className="mt-6 rounded-md bg-indigo-700 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800"
+        className="mt-6 rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900"
       >
         Go home
       </Link>

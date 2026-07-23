@@ -59,6 +59,7 @@ describe("signupWithInvite", () => {
       lastName: "Member",
       email: "new@test.local",
       password: "password123",
+      grade: "junior",
       rawInviteToken: rawToken,
     });
     expect(result.ok).toBe(true);
@@ -88,6 +89,7 @@ describe("signupWithInvite", () => {
       lastName: "A",
       email: "a@test.local",
       password: "password123",
+      grade: "senior",
       rawInviteToken: rawToken,
     });
 
@@ -99,6 +101,7 @@ describe("signupWithInvite", () => {
       lastName: "B",
       email: "b@test.local",
       password: "password123",
+      grade: "senior",
       rawInviteToken: rawToken,
     });
     expect(second).toEqual({ ok: false, reason: "invalid_invite" });
@@ -116,6 +119,7 @@ describe("signupWithInvite", () => {
       lastName: "Licate",
       email: "officer@test.local",
       password: "password123",
+      grade: "senior",
       rawInviteToken: rawToken,
     });
     expect(dup).toEqual({ ok: false, reason: "email_taken" });

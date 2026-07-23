@@ -84,6 +84,7 @@ async function seedDemo(officerId: number) {
       description: "Sorting and packing donations at the community food pantry.",
       location: "Community Center",
       status: "completed",
+      category: "soup_kitchen",
       createdById: officerId,
       approvedById: officerId,
       timeslots: {
@@ -112,10 +113,11 @@ async function seedDemo(officerId: number) {
   // Active event with two timeslots; member is confirmed on the morning slot.
   const concert = await db.event.create({
     data: {
-      title: "Spring Concert Volunteering",
-      description: "Ushering, setup, and teardown for the spring concert.",
-      location: "School Auditorium",
+      title: "School Garden Workday",
+      description: "Planting and weeding in the school courtyard garden.",
+      location: "School Courtyard",
       status: "active",
+      category: "gardening",
       createdById: officerId,
       approvedById: officerId,
       timeslots: {
@@ -154,6 +156,7 @@ async function seedDemo(officerId: number) {
       description: "Reading with elementary school students at the town library.",
       location: "Town Library",
       status: "pending_approval",
+      category: "tutoring",
       createdById: member.id,
       timeslots: {
         create: {

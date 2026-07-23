@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import { hoursRemaining, progressColor, progressPct } from "@/lib/hours";
 
 describe("configurable goal", () => {
-  it("defaults to a 10-hour goal with 3/7 thresholds", () => {
-    expect(progressColor(2.9)).toBe("danger");
-    expect(progressColor(3)).toBe("warning");
-    expect(progressColor(7)).toBe("success");
-    expect(hoursRemaining(4)).toBe(6);
-    expect(progressPct(5)).toBe(50);
+  it("defaults to a 30-hour goal with 9/21 thresholds", () => {
+    expect(progressColor(8.9)).toBe("danger");
+    expect(progressColor(9)).toBe("warning");
+    expect(progressColor(21)).toBe("success");
+    expect(hoursRemaining(4)).toBe(26);
+    expect(progressPct(15)).toBe(50);
   });
 
   it("scales thresholds to a custom goal", () => {

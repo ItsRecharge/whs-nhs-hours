@@ -24,7 +24,7 @@ export default async function AuditLogPage() {
         <div>
           <Link
             href="/officer/admin"
-            className="flex items-center gap-1.5 text-sm text-indigo-700 hover:underline"
+            className="flex items-center gap-1.5 text-sm text-blue-800 hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to admin

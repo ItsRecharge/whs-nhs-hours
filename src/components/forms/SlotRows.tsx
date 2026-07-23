@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 
 const field =
-  "w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
+  "w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
 
 interface Row {
   key: number;
@@ -101,7 +101,7 @@ export function SlotRows({
         <button
           type="button"
           onClick={add}
-          className="flex items-center gap-1.5 text-sm font-medium text-indigo-700 hover:underline"
+          className="flex items-center gap-1.5 text-sm font-medium text-blue-800 hover:underline"
         >
           <Plus className="h-4 w-4" /> Add timeslot
         </button>

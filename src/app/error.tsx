@@ -12,7 +12,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
       <div className="mt-6 flex gap-3">
         <button
           onClick={reset}
-          className="rounded-md bg-indigo-700 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800"
+          className="rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900"
         >
           Try again
         </button>

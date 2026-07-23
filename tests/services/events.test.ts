@@ -168,7 +168,12 @@ describe("attendance crediting", () => {
 
     const result = await markSlotAttendance(slotId, [members[0].id], officer.id);
     expect(result?.credited).toEqual([
-      { userId: members[0].id, hours: 3, eventTitle: "Festival" },
+      {
+        userId: members[0].id,
+        hours: 3,
+        eventTitle: "Festival",
+        eventCategory: "general",
+      },
     ]);
 
     const updatedEvent = await db.event.findUnique({ where: { id: event.id } });

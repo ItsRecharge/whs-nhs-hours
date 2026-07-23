@@ -73,7 +73,7 @@ export default async function OfficerEventsPage() {
                       {(e.status === "active" || e.status === "completed") && (
                         <Link
                           href={`/officer/events/${e.id}/attendance`}
-                          className="text-sm font-medium text-indigo-700 hover:underline"
+                          className="text-sm font-medium text-blue-800 hover:underline"
                         >
                           {e.status === "completed"
                             ? "Edit attendance"
