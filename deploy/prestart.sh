@@ -37,13 +37,17 @@ else
 fi
 
 # --- Install deps when the lockfile changed (or node_modules is missing). ---
+# --include=dev: the unit sets NODE_ENV=production, which would otherwise make
+# npm skip devDependencies — but `next build` needs them (@tailwindcss/postcss,
+# typescript). The "dev-" marker prefix invalidates prod-only installs.
 LOCK_MARKER="data/.installed-lock-hash"
 LOCK_HASH="$({ sha256sum package-lock.json 2>/dev/null || shasum -a 256 package-lock.json 2>/dev/null || echo none; } | cut -d' ' -f1)"
-INSTALLED_HASH="$(cat "$LOCK_MARKER" 2>/dev/null || echo missing)"
-if [ ! -d node_modules ] || [ "$LOCK_HASH" != "$INSTALLED_HASH" ]; then
+LOCK_STAMP="dev-$LOCK_HASH"
+INSTALLED_STAMP="$(cat "$LOCK_MARKER" 2>/dev/null || echo missing)"
+if [ ! -d node_modules ] || [ "$LOCK_STAMP" != "$INSTALLED_STAMP" ]; then
   echo "prestart: installing dependencies (lockfile changed or node_modules missing)."
-  if [ -f package-lock.json ]; then npm ci; else npm install; fi
-  printf '%s' "$LOCK_HASH" > "$LOCK_MARKER"
+  if [ -f package-lock.json ]; then npm ci --include=dev; else npm install --include=dev; fi
+  printf '%s' "$LOCK_STAMP" > "$LOCK_MARKER"
 fi
 
 MARKER="data/.built-commit"
