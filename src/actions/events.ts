@@ -117,7 +117,7 @@ export async function approveRequestAction(formData: FormData): Promise<void> {
     const requesterId = event.createdById;
     const slots = await eventSlots(event.id);
     after(async () => {
-      await notifyRequestDecision(requesterId, event.title, true);
+      if (requesterId !== null) await notifyRequestDecision(requesterId, event.title, true);
       await notifyEventPosted({ title: event.title, slots });
     });
     await recordAudit({
@@ -143,7 +143,9 @@ export async function denyRequestAction(formData: FormData): Promise<void> {
   const event = await denyRequest(eventId);
   if (event) {
     const requesterId = event.createdById;
-    after(() => notifyRequestDecision(requesterId, event.title, false));
+    after(async () => {
+      if (requesterId !== null) await notifyRequestDecision(requesterId, event.title, false);
+    });
     await recordAudit({
       actor: officer,
       action: "event.deny",

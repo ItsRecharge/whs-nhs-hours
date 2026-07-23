@@ -155,7 +155,14 @@ export const chapterSettingsSchema = z
   .refine((s) => s.outsideHoursCap <= s.totalHoursGoal, {
     message: "Outside-hours cap can't exceed the total goal",
     path: ["outsideHoursCap"],
-  });
+  })
+  // Recurring annual date: 2001 is non-leap, so Feb 29 is rejected too.
+  .refine(
+    (s) =>
+      new Date(Date.UTC(2001, s.schoolYearEndMonth - 1, s.schoolYearEndDay)).getUTCMonth() ===
+      s.schoolYearEndMonth - 1,
+    { message: "That day doesn't exist in that month", path: ["schoolYearEndDay"] },
+  );
 
 export const setupSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),

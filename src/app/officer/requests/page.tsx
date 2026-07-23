@@ -39,7 +39,7 @@ export default async function OfficerRequestsPage() {
                   <div>
                     <p className="text-lg font-semibold text-gray-900">{e.title}</p>
                     <p className="mt-1 text-sm text-gray-500">
-                      Requested by {fullName(e.createdBy)}
+                      Requested by {e.createdBy ? fullName(e.createdBy) : "a former member"}
                       {e.location ? ` · ${e.location}` : ""}
                     </p>
                     <ul className="mt-1 text-sm text-gray-500">

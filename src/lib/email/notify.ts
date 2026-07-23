@@ -56,6 +56,8 @@ export async function notifyEventPosted(event: {
   slots: { date: Date; startTime: string; endTime: string }[];
 }): Promise<void> {
   await safeSend(async () => {
+    // Approval re-fetches slots from the DB; they can be gone by then.
+    if (event.slots.length === 0) return;
     const recipients = await verifiedEmailsByRole("member");
     if (recipients.length === 0) return;
     const whenLabel =

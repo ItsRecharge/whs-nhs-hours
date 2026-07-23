@@ -16,7 +16,11 @@ import { recordAudit } from "@/lib/services/audit-service";
 import {
   syncSheetsAfterChange,
 } from "@/lib/services/sheet-sync-service";
-import { assignHouse, bulkAssignHouse } from "@/lib/services/house-service";
+import {
+  assignHouse,
+  bulkAssignHouse,
+  HouseAssignmentError,
+} from "@/lib/services/house-service";
 import { graduatedSeniorInfo } from "@/lib/services/member-service";
 import { setFlash } from "@/lib/flash";
 import type { Role } from "@/lib/constants";
@@ -168,7 +172,24 @@ export async function setHouseAction(formData: FormData): Promise<void> {
   const raw = String(formData.get("houseId") ?? "");
   const houseId = raw ? Number(raw) : null;
 
-  await assignHouse(userId, houseId);
+  if (!Number.isInteger(userId) || userId <= 0) {
+    await setFlash("warning", "Invalid member.");
+    redirect("/officer/members");
+  }
+  if (houseId !== null && (!Number.isInteger(houseId) || houseId <= 0)) {
+    await setFlash("warning", "Invalid house.");
+    redirect(memberPath(userId));
+  }
+
+  try {
+    await assignHouse(userId, houseId);
+  } catch (err) {
+    if (err instanceof HouseAssignmentError) {
+      await setFlash("warning", err.message);
+      redirect(memberPath(userId));
+    }
+    throw err;
+  }
   const houseName = houseId
     ? (await db.house.findUnique({ where: { id: houseId } }))?.name ?? "a house"
     : null;
@@ -232,7 +253,21 @@ export async function bulkAssignHouseAction(formData: FormData): Promise<void> {
     redirect("/officer/members");
   }
 
-  const count = await bulkAssignHouse(userIds, houseId);
+  if (houseId !== null && (!Number.isInteger(houseId) || houseId <= 0)) {
+    await setFlash("warning", "Invalid house.");
+    redirect("/officer/members");
+  }
+
+  let count: number;
+  try {
+    count = await bulkAssignHouse(userIds, houseId);
+  } catch (err) {
+    if (err instanceof HouseAssignmentError) {
+      await setFlash("warning", err.message);
+      redirect("/officer/members");
+    }
+    throw err;
+  }
   const houseName = houseId
     ? (await db.house.findUnique({ where: { id: houseId } }))?.name ?? "a house"
     : "no house";

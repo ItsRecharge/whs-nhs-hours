@@ -55,12 +55,12 @@ model Event {
   location     String?
   status       String   @default("active") // "active" | "completed" | "pending_approval" | "cancelled"
   category     String   @default("general") // "general" | "tutoring" | "soup_kitchen" | "gardening"
-  createdById  Int
+  createdById  Int? // null once the creating account is deleted; the event survives
   approvedById Int?
   createdAt    DateTime @default(now())
 
-  createdBy  User       @relation("CreatedBy", fields: [createdById], references: [id])
-  approvedBy User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
+  createdBy  User?      @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  approvedBy User?      @relation("ApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
   timeslots  Timeslot[]
   shareLinks ShareLink[]
   organizers OrganizerEvent[]
@@ -95,8 +95,8 @@ model EventSignup {
   markedById Int?
 
   timeslot Timeslot @relation(fields: [timeslotId], references: [id], onDelete: Cascade)
-  user     User     @relation("UserSignups", fields: [userId], references: [id])
-  markedBy User?    @relation("MarkedBy", fields: [markedById], references: [id])
+  user     User     @relation("UserSignups", fields: [userId], references: [id], onDelete: Cascade)
+  markedBy User?    @relation("MarkedBy", fields: [markedById], references: [id], onDelete: SetNull)
 
   @@unique([timeslotId, userId])
 }
@@ -117,7 +117,7 @@ model HourReport {
   createdAt      DateTime  @default(now())
 
   user       User  @relation("ReportOwner", fields: [userId], references: [id], onDelete: Cascade)
-  reviewedBy User? @relation("ReportReviewer", fields: [reviewedById], references: [id])
+  reviewedBy User? @relation("ReportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([userId])
@@ -134,7 +134,7 @@ model InviteToken {
   revokedAt   DateTime?
   createdAt   DateTime  @default(now())
 
-  createdBy User @relation(fields: [createdById], references: [id])
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
 }
 
 model AuthToken {
@@ -177,7 +177,7 @@ model ShareLink {
   createdAt      DateTime  @default(now())
 
   event     Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  createdBy User   @relation(fields: [createdById], references: [id])
+  createdBy User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   @@index([kind])
 }

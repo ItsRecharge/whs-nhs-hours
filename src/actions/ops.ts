@@ -59,7 +59,7 @@ export async function requestOpsGrantAction(formData: FormData): Promise<void> {
 
   const grant = await signOpsGrant({
     userId: user.id,
-    email: user.email,
+    email: user.email.toLowerCase(),
     bootstrap: user.isBootstrapOfficer,
   });
   (await cookies()).set(OPS_GRANT_COOKIE, grant, {
