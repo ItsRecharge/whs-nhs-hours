@@ -1,62 +1,60 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireUser, fullName } from "@/lib/current-user";
+import { redirect } from "next/navigation";
+import { validateShareLink } from "@/lib/services/share-service";
 import { getEventForAttendance } from "@/lib/services/attendance-service";
-import { markAttendanceAction } from "@/actions/attendance";
+import { markShareAttendanceAction } from "@/actions/share-attendance";
 import { SubmitButton } from "@/components/SubmitButton";
-import { ShareLinkButton } from "@/components/ShareLinkButton";
-import { ShareLinkReveal } from "@/components/ShareLinkReveal";
+import { fullName } from "@/lib/current-user";
 import { formatSlot } from "@/lib/format";
+import { rateLimit } from "@/lib/rate-limit";
+import { requestIp } from "@/lib/request-ip";
 
-export default async function AttendancePage({
+export const metadata = { title: "Attendance — NHS Hours Log" };
+export const dynamic = "force-dynamic";
+
+export default async function ShareAttendancePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ token: string }>;
 }) {
-  await requireUser("officer");
-  const { id } = await params;
-  const eventId = Number(id);
-  const event = await getEventForAttendance(eventId);
-  if (!event) notFound();
+  const { token } = await params;
+
+  const ip = await requestIp();
+  if (!rateLimit(`share-view:${ip}`, 60, 60 * 60 * 1000)) redirect("/share/expired");
+
+  const link = await validateShareLink(token, "attendance");
+  if (!link || !link.eventId) redirect("/share/expired");
+
+  const event = await getEventForAttendance(link.eventId);
+  if (!event) redirect("/share/expired");
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <Link href="/officer/events" className="text-sm text-indigo-700 hover:underline">
-          ← Back to events
-        </Link>
-        <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
-          <ShareLinkButton kind="attendance" eventId={eventId} />
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
         <p className="text-sm text-gray-500">
-          Take attendance per timeslot. The event is marked completed once every slot
-          is recorded. Only confirmed volunteers are listed. Share the attendance
-          sheet with an outside organizer so they can check people off themselves.
+          Attendance sheet shared with {link.organizerName}. Check off the
+          volunteers who showed up and save each timeslot — hours are credited
+          automatically.
         </p>
       </div>
-
-      <ShareLinkReveal path={`/officer/events/${eventId}/attendance`} />
 
       {event.timeslots.map((slot) => {
         const confirmed = slot.signups.filter((s) => s.status === "confirmed");
         return (
           <form
             key={slot.id}
-            action={markAttendanceAction}
+            action={markShareAttendanceAction}
             className="rounded-xl bg-white p-6 shadow-sm"
           >
+            <input type="hidden" name="token" value={token} />
             <input type="hidden" name="timeslotId" value={slot.id} />
-            <input type="hidden" name="eventId" value={eventId} />
 
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-gray-900">{formatSlot(slot)}</p>
-                <p className="text-xs text-gray-500">
-                  {slot.hoursValue} hrs · {confirmed.length} confirmed
-                  {slot.completedAt ? " · recorded" : ""}
-                </p>
-              </div>
+            <div className="mb-3">
+              <p className="font-semibold text-gray-900">{formatSlot(slot)}</p>
+              <p className="text-xs text-gray-500">
+                {slot.hoursValue} hrs · {confirmed.length} confirmed
+                {slot.completedAt ? " · recorded" : ""}
+              </p>
             </div>
 
             {confirmed.length === 0 ? (
@@ -72,7 +70,7 @@ export default async function AttendancePage({
                         name="present"
                         value={s.userId}
                         defaultChecked={s.attended}
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        className="h-4 w-4 rounded border-gray-300 text-blue-700"
                       />
                       <label
                         htmlFor={`p-${slot.id}-${s.userId}`}

@@ -6,6 +6,8 @@ import {
 import { listHouses } from "@/lib/services/house-service";
 import { MembersTable, type MemberRow } from "@/components/MembersTable";
 import { GraduatesBanner } from "@/components/GraduatesBanner";
+import { ShareLinkButton } from "@/components/ShareLinkButton";
+import { ShareLinkReveal } from "@/components/ShareLinkReveal";
 
 export default async function OfficerMembersPage() {
   await requireUser("officer");
@@ -41,13 +43,18 @@ export default async function OfficerMembersPage() {
             bulk actions.
           </p>
         </div>
-        <a
-          href="/officer/export/members.csv"
-          className="text-sm font-medium text-blue-800 hover:underline"
-        >
-          Export CSV
-        </a>
+        <div className="flex items-center gap-3">
+          <ShareLinkButton kind="roster" />
+          <a
+            href="/officer/export/members.csv"
+            className="text-sm font-medium text-blue-800 hover:underline"
+          >
+            Export CSV
+          </a>
+        </div>
       </div>
+
+      <ShareLinkReveal path="/officer/members" />
 
       {graduates.show && (
         <GraduatesBanner count={graduates.count} cutoffYear={graduates.cutoffYear} />

@@ -1,6 +1,8 @@
 import { requireUser, fullName } from "@/lib/current-user";
 import { listActiveInvites } from "@/lib/services/invite-service";
+import { listShareLinks } from "@/lib/services/share-service";
 import { createInviteAction, revokeInviteAction } from "@/actions/invites";
+import { revokeShareLinkAction } from "@/actions/share-links";
 import { SubmitButton } from "@/components/SubmitButton";
 import { InviteLinkReveal } from "@/components/InviteLinkReveal";
 import { formatEventDate } from "@/lib/format";
@@ -11,7 +13,10 @@ const label = "mb-1 block text-sm font-medium text-gray-700";
 
 export default async function OfficerInvitesPage() {
   await requireUser("officer");
-  const invites = await listActiveInvites();
+  const [invites, shareLinks] = await Promise.all([
+    listActiveInvites(),
+    listShareLinks(),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -62,6 +67,7 @@ export default async function OfficerInvitesPage() {
               <select id="role" name="role" className={field}>
                 <option value="member">Member</option>
                 <option value="officer">Officer</option>
+                <option value="organizer">Organizer (outside partner)</option>
               </select>
             </div>
             <div>
@@ -105,6 +111,67 @@ export default async function OfficerInvitesPage() {
                   <td className="px-6 py-3 text-right">
                     <form action={revokeInviteAction}>
                       <input type="hidden" name="inviteId" value={inv.id} />
+                      <button
+                        type="submit"
+                        className="text-sm font-medium text-red-600 hover:underline"
+                      >
+                        Revoke
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="overflow-hidden rounded-xl bg-white shadow-sm">
+        <div className="px-6 pt-5">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Organizer share links
+          </h2>
+          <p className="text-sm text-gray-500">
+            Public links for outside organizers — created from the Members page
+            (roster) or an event&apos;s attendance page.
+          </p>
+        </div>
+        {shareLinks.length === 0 ? (
+          <p className="p-6 text-sm text-gray-500">No active share links.</p>
+        ) : (
+          <table className="mt-3 w-full text-sm">
+            <thead className="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+              <tr>
+                <th className="px-6 py-3">Organizer</th>
+                <th className="px-6 py-3">Shares</th>
+                <th className="px-6 py-3">Created by</th>
+                <th className="px-6 py-3">Expires</th>
+                <th className="px-6 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {shareLinks.map((s) => (
+                <tr key={s.id}>
+                  <td className="px-6 py-3">
+                    <span className="font-medium text-gray-900">{s.organizerName}</span>
+                    {s.organizerEmail ? (
+                      <span className="block text-xs text-gray-500">
+                        {s.organizerEmail}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="px-6 py-3 text-gray-600">
+                    {s.kind === "roster"
+                      ? "Roster (read-only)"
+                      : `Attendance — ${s.event?.title ?? "deleted event"}`}
+                  </td>
+                  <td className="px-6 py-3 text-gray-600">{fullName(s.createdBy)}</td>
+                  <td className="px-6 py-3 text-gray-600">
+                    {formatEventDate(s.expiresAt)}
+                  </td>
+                  <td className="px-6 py-3 text-right">
+                    <form action={revokeShareLinkAction}>
+                      <input type="hidden" name="shareLinkId" value={s.id} />
                       <button
                         type="submit"
                         className="text-sm font-medium text-red-600 hover:underline"
