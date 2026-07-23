@@ -56,7 +56,7 @@ export const TEST_TEMPLATES: Record<string, TemplateEntry> = {
         "https://example.com/signup?token=sample",
         days(7),
         "An officer",
-        "NHS Chapter",
+        "Aberjona NHS Chapter",
       ),
   },
   event_posted: {

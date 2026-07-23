@@ -6,7 +6,7 @@ import { reportHoursAction } from "@/actions/hour-reports";
 import { SubmitButton } from "@/components/SubmitButton";
 
 const field =
-  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200";
+  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
 const CATEGORY_OPTIONS: {
@@ -62,7 +62,7 @@ export function ReportHoursForm() {
   const originCard = (checked: boolean) =>
     `block cursor-pointer rounded-lg border px-4 py-3 text-sm transition ${
       checked
-        ? "border-blue-700 bg-blue-50 ring-2 ring-blue-200"
+        ? "border-primary-700 bg-primary-50 ring-2 ring-primary-200"
         : "border-gray-300 hover:border-gray-400"
     }`;
 
@@ -170,7 +170,7 @@ export function ReportHoursForm() {
           </label>
           <label
             htmlFor="photo"
-            className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-gray-300 px-3 py-3 text-sm text-gray-600 transition hover:border-blue-600 hover:text-blue-800"
+            className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-gray-300 px-3 py-3 text-sm text-gray-600 transition hover:border-primary-600 hover:text-primary-800"
           >
             <ImagePlus className="h-4 w-4" />
             {preview ? "Change photo" : "Upload a photo (JPEG, PNG, or WebP, 10 MB max)"}

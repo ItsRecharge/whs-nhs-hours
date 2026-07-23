@@ -27,7 +27,7 @@ export default async function OrganizerAttendancePage({
       <div>
         <Link
           href="/organizer/dashboard"
-          className="text-sm text-blue-800 hover:underline"
+          className="text-sm text-primary-800 hover:underline"
         >
           ← Back to my events
         </Link>
@@ -70,7 +70,7 @@ export default async function OrganizerAttendancePage({
                         name="present"
                         value={s.userId}
                         defaultChecked={s.attended}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-700"
+                        className="h-4 w-4 rounded border-gray-300 text-primary-700"
                       />
                       <label
                         htmlFor={`p-${slot.id}-${s.userId}`}

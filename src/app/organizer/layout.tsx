@@ -21,7 +21,7 @@ export default async function OrganizerLayout({
 
   return (
     <div className="min-h-screen">
-      <header className="bg-blue-900 text-white shadow">
+      <header className="bg-primary-900 text-white shadow">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
           <BrandLogo
             href="/organizer/dashboard"

@@ -6,7 +6,7 @@ import { RosterReadOnly } from "@/components/RosterReadOnly";
 import { rateLimit } from "@/lib/rate-limit";
 import { requestIp } from "@/lib/request-ip";
 
-export const metadata = { title: "Roster — NHS Hours Log" };
+export const metadata = { title: "Roster — Aberjona NHS" };
 export const dynamic = "force-dynamic";
 
 export default async function ShareRosterPage({

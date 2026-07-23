@@ -9,7 +9,7 @@ import {
 import { SubmitButton } from "@/components/SubmitButton";
 
 const field =
-  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
+  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
 function Feedback({ state }: { state: IntegrationFormState }) {
@@ -143,7 +143,7 @@ export function SheetsForm({
           name="sheetsJson"
           type="file"
           accept="application/json,.json"
-          className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-blue-800 hover:file:bg-blue-100"
+          className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-primary-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-800 hover:file:bg-primary-100"
         />
         <p className="mt-1 text-xs text-gray-500">
           Upload the service-account JSON key file from Google Cloud. Share the

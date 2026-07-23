@@ -6,7 +6,7 @@ import { createShareLinkAction } from "@/actions/share-links";
 import { SubmitButton } from "@/components/SubmitButton";
 
 const field =
-  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200";
+  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
 /**
@@ -32,7 +32,7 @@ export function ShareLinkButton({
         onClick={() => setOpen(true)}
         className={
           buttonClassName ??
-          "inline-flex items-center gap-1.5 rounded-md border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-100"
+          "inline-flex items-center gap-1.5 rounded-md border border-primary-300 bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-800 transition hover:bg-primary-100"
         }
       >
         <Share2 className="h-4 w-4" />

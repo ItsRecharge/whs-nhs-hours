@@ -27,25 +27,26 @@ export default async function LandingPage() {
       ))}
 
       <div className="relative z-10 mx-auto w-full max-w-2xl px-4 text-center">
-        <span className="mb-4 inline-block rounded-md bg-white/15 px-3 py-1 text-xs font-bold tracking-[2px] text-white/80 uppercase">
-          National Honor Society
+        <span className="mb-4 inline-block text-xs font-bold tracking-[2px] text-accent-300 uppercase">
+          Aberjona Chapter &middot; National Honor Society
         </span>
 
         <div className="mb-2 flex justify-center">
-          <Award className="h-12 w-12 text-white/90" />
+          <Award className="h-12 w-12 text-accent-400" />
         </div>
 
         <h1 className="text-5xl leading-tight font-black tracking-tight text-white">
-          NHS Chapter
+          Aberjona NHS
         </h1>
         <h2 className="mt-1 text-2xl font-light tracking-[2px] text-white/70 uppercase">
           Hours Log
         </h2>
 
-        <div className="mx-auto my-5 h-[3px] w-12 rounded bg-white/35" />
+        <div className="mx-auto my-5 h-[3px] w-12 rounded bg-accent-400" />
 
         <p className="mx-auto mb-12 max-w-md leading-relaxed text-white/75">
-          Track and manage community service hours for the chapter.
+          Track and manage community service hours for the Aberjona chapter at
+          Winchester High School.
         </p>
 
         <div className="mx-auto mb-6 grid max-w-md grid-cols-2 gap-4">

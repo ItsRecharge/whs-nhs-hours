@@ -23,7 +23,7 @@ export function BrandLogo({
     >
       <span className="rounded-lg bg-white px-2 py-1 shadow-sm">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/nhs-logo.png" alt="National Honor Society" className={imgClassName} />
+        <img src="/nhs-logo.png" alt="Aberjona Chapter of the National Honor Society" className={imgClassName} />
       </span>
       {label ? (
         <span className="text-xs font-semibold tracking-wide text-white/80">{label}</span>

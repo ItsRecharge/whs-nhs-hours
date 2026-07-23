@@ -16,7 +16,7 @@ export default async function SetupPage() {
       <div className="relative z-10 w-full max-w-lg">
         <div className="mb-6 flex items-center justify-center gap-2 text-white">
           <span className="text-sm font-bold tracking-[2px] uppercase">
-            NHS Hours Log — Setup
+            Aberjona NHS — Setup
           </span>
         </div>
         <div className="rounded-2xl bg-white p-8 shadow-2xl">

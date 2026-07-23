@@ -47,7 +47,7 @@ export default async function OrganizerDashboard() {
                   <StatusBadge status={e.status} />
                   <Link
                     href={`/organizer/events/${e.id}/attendance`}
-                    className="rounded-md border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-100"
+                    className="rounded-md border border-primary-300 bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-800 transition hover:bg-primary-100"
                   >
                     Attendance
                   </Link>

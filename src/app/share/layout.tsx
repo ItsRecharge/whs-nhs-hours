@@ -7,11 +7,11 @@ import { Award } from "lucide-react";
 export default function ShareLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
-      <header className="bg-blue-900 text-white shadow">
+      <header className="bg-primary-900 text-white shadow">
         <div className="mx-auto flex max-w-4xl items-center gap-2 px-4 py-3">
-          <Award className="h-5 w-5" />
+          <Award className="h-5 w-5 text-accent-400" />
           <span className="text-sm font-bold tracking-[2px] uppercase">
-            NHS Hours Log
+            Aberjona NHS
           </span>
           <span className="ml-auto rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold text-white/80">
             Organizer view

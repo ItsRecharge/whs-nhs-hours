@@ -19,7 +19,7 @@ export function BottomNav({ variant }: { variant: "member" | "officer" }) {
             key={item.href}
             href={item.href}
             className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition-colors ${
-              active ? "text-blue-800" : "text-gray-500 hover:text-gray-800"
+              active ? "text-primary-800" : "text-gray-500 hover:text-gray-800"
             }`}
           >
             <item.icon className="h-5 w-5" />

@@ -8,7 +8,7 @@ import { formatSlot } from "@/lib/format";
 import { rateLimit } from "@/lib/rate-limit";
 import { requestIp } from "@/lib/request-ip";
 
-export const metadata = { title: "Attendance — NHS Hours Log" };
+export const metadata = { title: "Attendance — Aberjona NHS" };
 export const dynamic = "force-dynamic";
 
 export default async function ShareAttendancePage({
@@ -70,7 +70,7 @@ export default async function ShareAttendancePage({
                         name="present"
                         value={s.userId}
                         defaultChecked={s.attended}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-700"
+                        className="h-4 w-4 rounded border-gray-300 text-primary-700"
                       />
                       <label
                         htmlFor={`p-${slot.id}-${s.userId}`}

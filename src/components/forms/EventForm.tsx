@@ -3,7 +3,7 @@ import { HOUR_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
 import { SlotRows } from "./SlotRows";
 
 const field =
-  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200";
+  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
 /**

@@ -1,18 +1,46 @@
 @import "tailwindcss";
 
+@theme {
+  /* Aberjona NHS navy — primary (hue ~218) */
+  --color-primary-50: #f2f5fa;
+  --color-primary-100: #e4ebf4;
+  --color-primary-200: #c5d3e8;
+  --color-primary-300: #9ab3d5;
+  --color-primary-400: #688cbd;
+  --color-primary-500: #4169a4;
+  --color-primary-600: #2d518f;
+  --color-primary-700: #224179;
+  --color-primary-800: #1b3466;
+  --color-primary-900: #142a52;
+  --color-primary-950: #0c1a36;
+
+  /* NHS gold — accent (hue ~43); accent-700+ only for text on light backgrounds */
+  --color-accent-50: #fdf9ec;
+  --color-accent-100: #faf0cf;
+  --color-accent-200: #f4df9d;
+  --color-accent-300: #ecc95f;
+  --color-accent-400: #e2b436;
+  --color-accent-500: #d4a017;
+  --color-accent-600: #b8860b;
+  --color-accent-700: #93670c;
+  --color-accent-800: #7a5410;
+  --color-accent-900: #664614;
+  --color-accent-950: #3b2607;
+}
+
 body {
   background-color: #f5f7f9;
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
-/* NHS navy-to-blue gradient used by the landing hero and auth pages */
+/* Aberjona NHS navy gradient used by the landing hero and auth pages */
 .hero-gradient {
   background: linear-gradient(
     135deg,
-    #0d2c6b 0%,
-    #123a85 40%,
-    #1d4fa3 70%,
-    #3a6fc4 100%
+    var(--color-primary-950) 0%,
+    var(--color-primary-900) 40%,
+    var(--color-primary-700) 70%,
+    var(--color-primary-500) 100%
   );
   position: relative;
   overflow: hidden;

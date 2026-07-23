@@ -78,7 +78,7 @@ export function MembersTable({
   }
 
   const selectClass =
-    "rounded-md border border-gray-300 px-2.5 py-1.5 text-sm text-gray-700 outline-none focus:border-blue-700";
+    "rounded-md border border-gray-300 px-2.5 py-1.5 text-sm text-gray-700 outline-none focus:border-primary-700";
 
   return (
     <div className="space-y-3">
@@ -143,8 +143,8 @@ export function MembersTable({
         ))}
 
         {selected.size > 0 && (
-          <div className="sticky top-0 z-10 mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 shadow-sm">
-            <span className="text-sm font-medium text-blue-900">
+          <div className="sticky top-0 z-10 mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-primary-200 bg-primary-50 px-4 py-2.5 shadow-sm">
+            <span className="text-sm font-medium text-primary-900">
               {selected.size} selected
             </span>
             <select name="houseId" className={selectClass} aria-label="House to assign">
@@ -158,7 +158,7 @@ export function MembersTable({
             <button
               type="submit"
               formAction={bulkAssignHouseAction}
-              className="rounded-md border border-blue-300 bg-white px-3 py-1.5 text-xs font-semibold text-blue-800 transition hover:bg-blue-100"
+              className="rounded-md border border-primary-300 bg-white px-3 py-1.5 text-xs font-semibold text-primary-800 transition hover:bg-primary-100"
             >
               Assign house
             </button>
@@ -173,7 +173,7 @@ export function MembersTable({
             <button
               type="button"
               onClick={() => setSelected(new Set())}
-              className="ml-auto text-xs font-medium text-blue-800 hover:underline"
+              className="ml-auto text-xs font-medium text-primary-800 hover:underline"
             >
               Clear selection
             </button>
@@ -221,7 +221,7 @@ export function MembersTable({
                     <td className="px-4 py-3">
                       <Link
                         href={`/officer/members/${m.id}`}
-                        className="font-medium text-gray-900 hover:text-blue-800 hover:underline"
+                        className="font-medium text-gray-900 hover:text-primary-800 hover:underline"
                       >
                         {m.firstName} {m.lastName}
                       </Link>
@@ -255,7 +255,7 @@ export function MembersTable({
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/officer/members/${m.id}`}
-                        className="inline-flex items-center gap-1 rounded-md border border-blue-300 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-800 transition hover:bg-blue-100"
+                        className="inline-flex items-center gap-1 rounded-md border border-primary-300 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition hover:bg-primary-100"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                         Manage

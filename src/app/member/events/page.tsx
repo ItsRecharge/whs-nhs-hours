@@ -24,7 +24,7 @@ export default async function MemberEventsPage() {
               <p className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                 {event.title}
                 {event.category !== "general" && (
-                  <span className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800">
+                  <span className="inline-block rounded-full bg-primary-100 px-2 py-0.5 text-xs font-semibold text-primary-800">
                     {HOUR_CATEGORY_LABELS[event.category as HourCategory]}
                   </span>
                 )}

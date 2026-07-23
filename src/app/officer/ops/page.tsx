@@ -10,7 +10,7 @@ import { OpsTerminal } from "@/components/OpsTerminal";
 import { gitHead, loadOpsWorkspace } from "@/lib/services/ops-service";
 
 const field =
-  "w-full rounded-2xl border border-white/20 bg-white/85 px-3 py-2 text-sm text-gray-900 outline-none backdrop-blur-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
+  "w-full rounded-2xl border border-white/20 bg-white/85 px-3 py-2 text-sm text-gray-900 outline-none backdrop-blur-md focus:border-primary-500 focus:ring-2 focus:ring-primary-200";
 const panel = "rounded-[28px] border border-white/30 bg-white/80 p-4 shadow-xl backdrop-blur-xl";
 
 function safePath(value: string | undefined): string {
@@ -65,7 +65,7 @@ export default async function OpsPage({
       <div className="mb-6 flex flex-col gap-4 rounded-[32px] border border-white/30 bg-white/70 p-4 shadow-xl backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-[2px] text-gray-500 uppercase">
-            <span className="rounded-full bg-blue-700 px-2 py-1 text-white">Super Admin</span>
+            <span className="rounded-full bg-primary-700 px-2 py-1 text-white">Super Admin</span>
             Operations Console
           </div>
           <h1 className="text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
@@ -96,7 +96,7 @@ export default async function OpsPage({
                 Browse the repository root and open a text file to edit.
               </p>
             </div>
-            <Link href="/officer/ops" className="text-sm font-semibold text-blue-800 hover:underline">
+            <Link href="/officer/ops" className="text-sm font-semibold text-primary-800 hover:underline">
               Root
             </Link>
           </div>
@@ -127,11 +127,11 @@ export default async function OpsPage({
                   <li key={entry.path}>
                     <Link
                       href={`/officer/ops?path=${encodeURIComponent(entry.path)}`}
-                      className="flex items-center justify-between rounded-xl px-3 py-2 text-sm transition hover:bg-blue-50"
+                      className="flex items-center justify-between rounded-xl px-3 py-2 text-sm transition hover:bg-primary-50"
                     >
                       <span className="flex items-center gap-2 font-medium text-gray-900">
                         {entry.kind === "dir" ? (
-                          <Folder className="h-4 w-4 text-blue-800" />
+                          <Folder className="h-4 w-4 text-primary-800" />
                         ) : (
                           <FileText className="h-4 w-4 text-gray-500" />
                         )}
@@ -155,7 +155,7 @@ export default async function OpsPage({
               </p>
             </div>
             {workspace.file ? (
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
+              <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800">
                 {workspace.file.size} bytes
               </span>
             ) : null}
@@ -168,7 +168,7 @@ export default async function OpsPage({
                 name="content"
                 defaultValue={workspace.file.content}
                 spellCheck={false}
-                className="min-h-[52vh] w-full rounded-3xl border border-gray-200 bg-white/90 p-4 font-mono text-[13px] leading-6 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                className="min-h-[52vh] w-full rounded-3xl border border-gray-200 bg-white/90 p-4 font-mono text-[13px] leading-6 text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
               />
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs text-gray-500">

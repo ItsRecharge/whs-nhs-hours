@@ -29,7 +29,7 @@ export function OpsTerminal() {
   return (
     <section className="rounded-[28px] border border-white/30 bg-white/80 p-4 shadow-xl backdrop-blur-xl">
       <div className="mb-2 flex items-center gap-2 text-lg font-semibold text-gray-900">
-        <TerminalSquare className="h-5 w-5 text-blue-800" /> Terminal
+        <TerminalSquare className="h-5 w-5 text-primary-800" /> Terminal
       </div>
       <div className="mb-3 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
         <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
@@ -75,7 +75,7 @@ export function OpsTerminal() {
           autoComplete="off"
           spellCheck={false}
           placeholder="Type a command and press Enter"
-          className="flex-1 rounded-2xl border border-gray-300 bg-white/90 px-3 py-2 font-mono text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          className="flex-1 rounded-2xl border border-gray-300 bg-white/90 px-3 py-2 font-mono text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
         />
         <button
           type="submit"

@@ -153,7 +153,7 @@ model AuthToken {
 
 model ChapterSettings {
   id              Int      @id @default(1) // singleton row
-  chapterName     String   @default("NHS Chapter")
+  chapterName     String   @default("Aberjona NHS Chapter")
   totalHoursGoal  Float    @default(30.0) // total hours over the full (2-year) membership
   outsideHoursCap Float    @default(14.0) // max outside hours that count toward the goal
   schoolYearEndMonth Int   @default(6) // month the school year ends (senior-deactivation cutoff)

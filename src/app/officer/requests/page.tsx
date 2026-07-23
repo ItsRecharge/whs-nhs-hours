@@ -102,7 +102,7 @@ export default async function OfficerRequestsPage() {
                         className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
                           r.origin === "outside"
                             ? "bg-yellow-100 text-yellow-800"
-                            : "bg-blue-100 text-blue-800"
+                            : "bg-primary-100 text-primary-800"
                         }`}
                       >
                         {r.origin === "outside" ? "Outside NHS" : "Inside NHS"}
@@ -127,7 +127,7 @@ export default async function OfficerRequestsPage() {
                           alt="Proof photo"
                           className="max-h-36 rounded-lg border border-gray-200 transition hover:opacity-90"
                         />
-                        <span className="mt-1 block text-xs text-blue-800 hover:underline">
+                        <span className="mt-1 block text-xs text-primary-800 hover:underline">
                           Open full-size proof photo
                         </span>
                       </a>

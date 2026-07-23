@@ -95,7 +95,7 @@ export default async function MemberDashboard() {
             </p>
             <Link
               href="/member/history"
-              className="text-xs font-medium text-blue-800 hover:underline"
+              className="text-xs font-medium text-primary-800 hover:underline"
             >
               View breakdown
             </Link>
@@ -106,7 +106,7 @@ export default async function MemberDashboard() {
           <p className="mt-3 text-xs text-gray-500">
             {pendingReports} hour report{pendingReports === 1 ? "" : "s"} awaiting officer
             approval ·{" "}
-            <Link href="/member/report-hours" className="text-blue-800 hover:underline">
+            <Link href="/member/report-hours" className="text-primary-800 hover:underline">
               view
             </Link>
           </p>
@@ -188,7 +188,7 @@ export default async function MemberDashboard() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-blue-800">
+                  <p className="text-sm font-medium text-primary-800">
                     {s.timeslot.hoursValue} hrs
                   </p>
                   {s.status === "waitlisted" && (

@@ -47,7 +47,7 @@ export default async function OfficerMembersPage() {
           <ShareLinkButton kind="roster" />
           <a
             href="/officer/export/members.csv"
-            className="text-sm font-medium text-blue-800 hover:underline"
+            className="text-sm font-medium text-primary-800 hover:underline"
           >
             Export CSV
           </a>

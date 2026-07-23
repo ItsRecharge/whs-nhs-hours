@@ -48,7 +48,7 @@ export function LoginForm({ next }: { next?: string }) {
           <input type="hidden" name="email" value={state.unverifiedEmail} />
           <button
             type="submit"
-            className="text-sm font-medium text-blue-800 hover:underline"
+            className="text-sm font-medium text-primary-800 hover:underline"
           >
             Resend verification email
           </button>
@@ -56,10 +56,10 @@ export function LoginForm({ next }: { next?: string }) {
       )}
 
       <div className="flex justify-between text-sm">
-        <Link href="/forgot-password" className="text-blue-800 hover:underline">
+        <Link href="/forgot-password" className="text-primary-800 hover:underline">
           Forgot password?
         </Link>
-        <Link href="/signup" className="text-blue-800 hover:underline">
+        <Link href="/signup" className="text-primary-800 hover:underline">
           Have an invite? Sign up
         </Link>
       </div>

@@ -16,26 +16,26 @@ export const RENEWAL_URL =
 /** Shared Google account used to sign into Cloudflare ("Sign in with Google"). */
 export const SIGN_IN_EMAIL = "Winchestertri.m@gmail.com";
 
-/** Standard subject prefix for every email: "NHS Hours - <specific>". */
+/** Standard subject prefix for every email: "Aberjona NHS - <specific>". */
 function subject(specific: string): string {
-  return `NHS Hours - ${specific}`;
+  return `Aberjona NHS - ${specific}`;
 }
 
 function layout(heading: string, bodyHtml: string, cta?: { label: string; url: string }) {
   const button = cta
-    ? `<a href="${cta.url}" style="display:inline-block;background:#1d4fa3;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;font-size:14px;margin:18px 0;">${cta.label}</a>`
+    ? `<a href="${cta.url}" style="display:inline-block;background:#1b3466;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;font-size:14px;margin:18px 0;">${cta.label}</a>`
     : "";
   return `<!doctype html><html><body style="margin:0;background:#f5f7f9;font-family:'Segoe UI',system-ui,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:24px;">
-    <div style="background:linear-gradient(135deg,#0d2c6b,#3a6fc4);border-radius:14px 14px 0 0;padding:22px 28px;">
-      <span style="color:#fff;font-weight:800;letter-spacing:1px;font-size:14px;">★ NHS HOURS LOG</span>
+    <div style="background:linear-gradient(135deg,#0c1a36,#224179);border-radius:14px 14px 0 0;padding:22px 28px;">
+      <span style="color:#fff;font-weight:800;letter-spacing:1px;font-size:14px;"><span style="color:#e2b436;">★</span> ABERJONA NHS</span>
     </div>
     <div style="background:#fff;border-radius:0 0 14px 14px;padding:28px;">
-      <h1 style="font-size:19px;color:#0d2c6b;margin:0 0 12px;">${heading}</h1>
+      <h1 style="font-size:19px;color:#142a52;margin:0 0 12px;">${heading}</h1>
       <div style="font-size:14px;color:#374151;line-height:1.6;">${bodyHtml}</div>
       ${button}
     </div>
-    <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:16px;">National Honor Society — Hours Log</p>
+    <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:16px;">Aberjona Chapter of the National Honor Society — Winchester High School</p>
   </div></body></html>`;
 }
 

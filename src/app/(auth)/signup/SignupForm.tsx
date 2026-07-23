@@ -47,11 +47,11 @@ export function SignupForm({
         <div>
           <span className={labelClass}>Grade</span>
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 has-[:checked]:border-blue-700 has-[:checked]:ring-2 has-[:checked]:ring-blue-200">
+            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 has-[:checked]:border-primary-700 has-[:checked]:ring-2 has-[:checked]:ring-primary-200">
               <input type="radio" name="grade" value="junior" required />
               Junior
             </label>
-            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 has-[:checked]:border-blue-700 has-[:checked]:ring-2 has-[:checked]:ring-blue-200">
+            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 has-[:checked]:border-primary-700 has-[:checked]:ring-2 has-[:checked]:ring-primary-200">
               <input type="radio" name="grade" value="senior" required />
               Senior
             </label>

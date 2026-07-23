@@ -27,7 +27,7 @@ export default async function VerifyEmailChangePage({
       <p className="text-sm text-gray-600">{message}</p>
       <Link
         href="/login"
-        className="mt-5 inline-block rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900"
+        className="mt-5 inline-block rounded-md bg-primary-800 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-900"
       >
         Go to Login
       </Link>

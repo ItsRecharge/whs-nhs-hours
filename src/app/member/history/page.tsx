@@ -20,7 +20,7 @@ export default async function MemberHistoryPage() {
       <div>
         <Link
           href="/member/dashboard"
-          className="flex items-center gap-1.5 text-sm text-blue-800 hover:underline"
+          className="flex items-center gap-1.5 text-sm text-primary-800 hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to dashboard
@@ -57,7 +57,7 @@ export default async function MemberHistoryPage() {
                       className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                         e.origin === "outside"
                           ? "bg-yellow-100 text-yellow-800"
-                          : "bg-blue-100 text-blue-800"
+                          : "bg-primary-100 text-primary-800"
                       }`}
                     >
                       {e.origin === "outside" ? "Outside" : "Inside"}

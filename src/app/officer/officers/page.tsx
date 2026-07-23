@@ -22,7 +22,7 @@ export default async function OfficersPage() {
       <div>
         <Link
           href="/officer/admin"
-          className="flex items-center gap-1.5 text-sm text-blue-800 hover:underline"
+          className="flex items-center gap-1.5 text-sm text-primary-800 hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to admin
@@ -38,9 +38,9 @@ export default async function OfficersPage() {
       <ResetLinkReveal />
 
       {meIsBootstrap && transferTargets.length > 0 ? (
-        <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-5">
+        <div className="rounded-xl border border-primary-200 bg-primary-50/60 p-5">
           <div className="mb-1 flex items-center gap-2 font-semibold text-gray-900">
-            <Crown className="h-4 w-4 text-blue-800" />
+            <Crown className="h-4 w-4 text-primary-800" />
             Transfer bootstrap role
           </div>
           <p className="mb-4 text-sm text-gray-600">
@@ -59,7 +59,7 @@ export default async function OfficersPage() {
                 id="targetId"
                 name="targetId"
                 required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
               >
                 {transferTargets.map((o) => (
                   <option key={o.id} value={o.id}>
@@ -77,7 +77,7 @@ export default async function OfficersPage() {
                 name="password"
                 type="password"
                 required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
               />
             </div>
             <SubmitButton pendingText="Transferring…">Transfer</SubmitButton>
@@ -120,7 +120,7 @@ export default async function OfficersPage() {
                         </span>
                       )}
                       {o.isBootstrapOfficer ? (
-                        <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-800">
+                        <span className="flex items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-800">
                           <ShieldCheck className="h-3 w-3" /> Bootstrap
                         </span>
                       ) : null}
