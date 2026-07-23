@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { requireUser } from "@/lib/current-user";
 import { getChapterSettings } from "@/lib/services/chapter-service";
-import { updateChapterAction } from "@/actions/chapter";
+import { listHouses } from "@/lib/services/house-service";
+import { updateChapterAction, updateHousesAction } from "@/actions/chapter";
 import { SubmitButton } from "@/components/SubmitButton";
 
 const field =
@@ -11,7 +12,7 @@ const label = "mb-1 block text-sm font-medium text-gray-700";
 
 export default async function ChapterSettingsPage() {
   await requireUser("officer");
-  const settings = await getChapterSettings();
+  const [settings, houses] = await Promise.all([getChapterSettings(), listHouses()]);
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -134,6 +135,36 @@ export default async function ChapterSettingsPage() {
             </p>
           </div>
           <SubmitButton pendingText="Saving…">Save Settings</SubmitButton>
+        </div>
+      </form>
+
+      <form action={updateHousesAction} className="rounded-xl bg-white p-6 shadow-sm">
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Houses</h2>
+            <p className="text-sm text-gray-500">
+              Members are split into these houses. Rename them to match your
+              chapter; officers assign each member from their member page.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {houses.map((h) => (
+              <div key={h.id}>
+                <label htmlFor={`house-${h.id}`} className={label}>
+                  House {h.sortOrder}
+                </label>
+                <input
+                  id={`house-${h.id}`}
+                  name={`house-${h.id}`}
+                  defaultValue={h.name}
+                  maxLength={40}
+                  required
+                  className={field}
+                />
+              </div>
+            ))}
+          </div>
+          <SubmitButton pendingText="Saving…">Save House Names</SubmitButton>
         </div>
       </form>
     </div>

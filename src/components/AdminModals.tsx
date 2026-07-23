@@ -11,7 +11,7 @@ import {
   Send,
   X,
 } from "lucide-react";
-import { updateChapterAction } from "@/actions/chapter";
+import { updateChapterAction, updateHousesAction } from "@/actions/chapter";
 import { yearEndResetAction } from "@/actions/reset";
 import { SubmitButton } from "@/components/SubmitButton";
 import { MailForm, SheetsForm } from "@/app/officer/integrations/IntegrationForms";
@@ -51,6 +51,7 @@ interface Props {
   outsideHoursCap: number;
   schoolYearEndMonth: number;
   schoolYearEndDay: number;
+  houses: { id: number; name: string; sortOrder: number }[];
   integrationStatus: IntegrationStatus;
   emailTestTo: string;
   auditLog: AuditEntry[];
@@ -136,6 +137,7 @@ export function AdminModals({
   outsideHoursCap,
   schoolYearEndMonth,
   schoolYearEndDay,
+  houses,
   integrationStatus,
   emailTestTo,
   auditLog,
@@ -323,6 +325,35 @@ export function AdminModals({
               </div>
             </div>
             <SubmitButton pendingText="Saving…">Save Settings</SubmitButton>
+          </form>
+          <form
+            action={updateHousesAction}
+            className="mt-6 space-y-4 border-t border-gray-100 pt-6"
+          >
+            <div>
+              <p className="font-semibold text-gray-900">Houses</p>
+              <p className="text-sm text-gray-500">
+                Members are split into these houses; rename to match your chapter.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {houses.map((h) => (
+                <div key={h.id}>
+                  <label htmlFor={`house-${h.id}`} className={label}>
+                    House {h.sortOrder}
+                  </label>
+                  <input
+                    id={`house-${h.id}`}
+                    name={`house-${h.id}`}
+                    defaultValue={h.name}
+                    maxLength={40}
+                    required
+                    className={field}
+                  />
+                </div>
+              ))}
+            </div>
+            <SubmitButton pendingText="Saving…">Save House Names</SubmitButton>
           </form>
         </Modal>
       )}

@@ -16,6 +16,8 @@ import { recordAudit } from "@/lib/services/audit-service";
 import {
   syncSheetsAfterChange,
 } from "@/lib/services/sheet-sync-service";
+import { assignHouse, bulkAssignHouse } from "@/lib/services/house-service";
+import { graduatedSeniorInfo } from "@/lib/services/member-service";
 import { setFlash } from "@/lib/flash";
 import type { Role } from "@/lib/constants";
 
@@ -158,4 +160,130 @@ export async function setActiveAction(formData: FormData): Promise<void> {
   await setFlash("info", active ? "Member reactivated." : "Member deactivated.");
   revalidatePath(memberPath(userId));
   redirect(memberPath(userId));
+}
+
+export async function setHouseAction(formData: FormData): Promise<void> {
+  const officer = await requireUser("officer");
+  const userId = Number(formData.get("userId"));
+  const raw = String(formData.get("houseId") ?? "");
+  const houseId = raw ? Number(raw) : null;
+
+  await assignHouse(userId, houseId);
+  const houseName = houseId
+    ? (await db.house.findUnique({ where: { id: houseId } }))?.name ?? "a house"
+    : null;
+  after(() => syncSheetsAfterChange());
+  await recordAudit({
+    actor: officer,
+    action: "roster.house",
+    summary: houseName
+      ? `Assigned ${await targetName(userId)} to ${houseName}`
+      : `Cleared house for ${await targetName(userId)}`,
+    targetType: "user",
+    targetId: userId,
+  });
+  await setFlash("success", houseName ? `Assigned to ${houseName}.` : "House cleared.");
+  revalidatePath(memberPath(userId));
+  redirect(memberPath(userId));
+}
+
+function selectedUserIds(formData: FormData): number[] {
+  return formData
+    .getAll("userIds")
+    .map(Number)
+    .filter((n) => Number.isInteger(n) && n > 0);
+}
+
+export async function bulkDeactivateAction(formData: FormData): Promise<void> {
+  const officer = await requireUser("officer");
+  const userIds = selectedUserIds(formData).filter((id) => id !== officer.id);
+  if (userIds.length === 0) {
+    await setFlash("warning", "No members selected.");
+    redirect("/officer/members");
+  }
+
+  let count = 0;
+  for (const id of userIds) {
+    try {
+      await setMemberActive(id, false); // also revokes their sessions
+      count++;
+    } catch (err) {
+      if (!(err instanceof BootstrapOfficerProtectionError)) throw err;
+    }
+  }
+  after(() => syncSheetsAfterChange());
+  await recordAudit({
+    actor: officer,
+    action: "roster.bulkDeactivate",
+    summary: `Bulk-deactivated ${count} member${count === 1 ? "" : "s"}`,
+  });
+  await setFlash("info", `Deactivated ${count} member${count === 1 ? "" : "s"}.`);
+  revalidatePath("/officer/members");
+  redirect("/officer/members");
+}
+
+export async function bulkAssignHouseAction(formData: FormData): Promise<void> {
+  const officer = await requireUser("officer");
+  const userIds = selectedUserIds(formData);
+  const raw = String(formData.get("houseId") ?? "");
+  const houseId = raw ? Number(raw) : null;
+  if (userIds.length === 0) {
+    await setFlash("warning", "No members selected.");
+    redirect("/officer/members");
+  }
+
+  const count = await bulkAssignHouse(userIds, houseId);
+  const houseName = houseId
+    ? (await db.house.findUnique({ where: { id: houseId } }))?.name ?? "a house"
+    : "no house";
+  after(() => syncSheetsAfterChange());
+  await recordAudit({
+    actor: officer,
+    action: "roster.bulkHouse",
+    summary: `Assigned ${count} member${count === 1 ? "" : "s"} to ${houseName}`,
+  });
+  await setFlash("success", `Assigned ${count} member${count === 1 ? "" : "s"} to ${houseName}.`);
+  revalidatePath("/officer/members");
+  redirect("/officer/members");
+}
+
+/** Deactivates every still-active member whose class has graduated. */
+export async function deactivateGraduatesAction(): Promise<void> {
+  const officer = await requireUser("officer");
+  const { count, cutoffYear } = await graduatedSeniorInfo();
+  if (count === 0) {
+    await setFlash("info", "No graduated members to deactivate.");
+    redirect("/officer/members");
+  }
+
+  const graduates = await db.user.findMany({
+    where: {
+      role: "member",
+      deactivatedAt: null,
+      graduationYear: { not: null, lte: cutoffYear },
+    },
+    select: { id: true },
+  });
+
+  let deactivated = 0;
+  for (const g of graduates) {
+    try {
+      await setMemberActive(g.id, false);
+      deactivated++;
+    } catch (err) {
+      if (!(err instanceof BootstrapOfficerProtectionError)) throw err;
+    }
+  }
+  after(() => syncSheetsAfterChange());
+  await recordAudit({
+    actor: officer,
+    action: "roster.deactivateGraduates",
+    summary: `Deactivated ${deactivated} graduated member${deactivated === 1 ? "" : "s"} (Class of ${cutoffYear} and earlier)`,
+  });
+  await setFlash(
+    "success",
+    `Deactivated ${deactivated} graduated member${deactivated === 1 ? "" : "s"}.`,
+  );
+  revalidatePath("/officer/members");
+  redirect("/officer/members");
 }

@@ -3,14 +3,21 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, UserCog } from "lucide-react";
 import { requireUser, fullName } from "@/lib/current-user";
 import { db } from "@/lib/db";
-import { hoursEarnedForUser } from "@/lib/services/member-service";
+import { hoursBreakdownForUser } from "@/lib/services/member-service";
 import { hoursHistoryForUser } from "@/lib/services/history-service";
 import { getTotalGoal } from "@/lib/services/chapter-service";
+import { listHouses } from "@/lib/services/house-service";
 import { hoursRemaining } from "@/lib/hours";
+import { HOUR_CATEGORY_LABELS } from "@/lib/constants";
 import { isBootstrapProtected } from "@/lib/services/bootstrap-service";
 import { ProgressBar } from "@/components/ProgressBar";
 import { SubmitButton } from "@/components/SubmitButton";
-import { adjustHoursAction, setActiveAction, setRoleAction } from "@/actions/roster";
+import {
+  adjustHoursAction,
+  setActiveAction,
+  setHouseAction,
+  setRoleAction,
+} from "@/actions/roster";
 import {
   bootstrapEditProfileAction,
   bootstrapSetPasswordAction,
@@ -33,11 +40,14 @@ export default async function MemberDetailPage({
   const member = await db.user.findUnique({ where: { id: memberId } });
   if (!member) notFound();
 
-  const [earned, goal, history] = await Promise.all([
-    hoursEarnedForUser(member.id),
+  const [breakdown, goal, history, houses] = await Promise.all([
+    hoursBreakdownForUser(member.id),
     getTotalGoal(),
     hoursHistoryForUser(member.id),
+    listHouses(),
   ]);
+  const earned = breakdown.total;
+  const memberHouse = houses.find((h) => h.id === member.houseId);
   const isSelf = member.id === officer.id;
   const bootstrapProtected = isBootstrapProtected(member);
 
@@ -55,6 +65,7 @@ export default async function MemberDetailPage({
         <p className="text-sm text-gray-500">
           {member.email}
           {member.graduationYear ? ` · Class of ${member.graduationYear}` : ""} ·{" "}
+          {memberHouse ? memberHouse.name : "No house"} ·{" "}
           <span className="capitalize">{member.role}</span>
           {member.deactivatedAt ? " · inactive" : ""}
           {bootstrapProtected ? " · bootstrap admin" : ""}
@@ -71,6 +82,48 @@ export default async function MemberDetailPage({
           </p>
         </div>
         <ProgressBar earned={earned} goal={goal} />
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+          <span>Inside: {breakdown.inside}</span>
+          <span>
+            Outside: {breakdown.outside} ({breakdown.outsideCounted} counted)
+          </span>
+          <span className={breakdown.requirements.tutoring ? "text-green-700" : "text-red-600"}>
+            {HOUR_CATEGORY_LABELS.tutoring}: {breakdown.requirements.tutoring ? "✓" : "✗"}
+          </span>
+          <span className={breakdown.requirements.soupKitchen ? "text-green-700" : "text-red-600"}>
+            {HOUR_CATEGORY_LABELS.soup_kitchen}:{" "}
+            {breakdown.requirements.soupKitchen ? "✓" : "✗"}
+          </span>
+          <span className={breakdown.requirements.gardening ? "text-green-700" : "text-red-600"}>
+            {HOUR_CATEGORY_LABELS.gardening}: {breakdown.requirements.gardening ? "✓" : "✗"}
+          </span>
+        </div>
+      </section>
+
+      <section className="rounded-xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">House</h2>
+        <form action={setHouseAction} className="flex items-end gap-3">
+          <input type="hidden" name="userId" value={member.id} />
+          <div className="flex-1">
+            <label htmlFor="houseId" className={label}>
+              Assigned house
+            </label>
+            <select
+              id="houseId"
+              name="houseId"
+              defaultValue={member.houseId ?? ""}
+              className={field}
+            >
+              <option value="">— Unassigned —</option>
+              {houses.map((h) => (
+                <option key={h.id} value={h.id}>
+                  {h.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <SubmitButton pendingText="Saving…">Save</SubmitButton>
+        </form>
       </section>
 
       <section className="rounded-xl bg-white p-6 shadow-sm">
