@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, Crown, ShieldCheck } from "lucide-react";
 import { requireUser, fullName } from "@/lib/current-user";
 import { listOfficers } from "@/lib/services/roster-service";
+import { listOrganizers } from "@/lib/services/organizer-service";
+import { setActiveAction } from "@/actions/roster";
 import { transferBootstrapAction } from "@/actions/officers";
 import { ResetLinkReveal } from "@/components/ResetLinkReveal";
 import { OfficerActionsMenu } from "@/components/OfficerActionsMenu";
@@ -9,7 +11,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function OfficersPage() {
   const me = await requireUser("officer");
-  const officers = await listOfficers();
+  const [officers, organizers] = await Promise.all([listOfficers(), listOrganizers()]);
   const meIsBootstrap = me.isBootstrapOfficer;
   const transferTargets = officers.filter(
     (o) => !o.isBootstrapOfficer && o.deactivatedAt === null,
@@ -150,6 +152,79 @@ export default async function OfficersPage() {
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+        <div className="px-6 pt-5">
+          <h2 className="text-lg font-semibold text-gray-900">Partner organizers</h2>
+          <p className="text-sm text-gray-500">
+            Outside partners with their own login. They see the read-only roster
+            and take attendance for events they&apos;re linked to (linked from
+            each event&apos;s edit page).
+          </p>
+        </div>
+        {organizers.length === 0 ? (
+          <p className="p-6 text-sm text-gray-500">
+            No organizer accounts. Create an organizer invite from the Invites
+            page.
+          </p>
+        ) : (
+          <table className="mt-3 w-full text-sm">
+            <thead className="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+              <tr>
+                <th className="px-6 py-3">Name</th>
+                <th className="px-6 py-3">Email</th>
+                <th className="px-6 py-3">Linked events</th>
+                <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {organizers.map((o) => (
+                <tr key={o.id} className={o.deactivatedAt ? "opacity-50" : ""}>
+                  <td className="px-6 py-3 font-medium text-gray-900">
+                    {o.firstName} {o.lastName}
+                  </td>
+                  <td className="px-6 py-3 text-gray-600">{o.email}</td>
+                  <td className="px-6 py-3 text-gray-600">
+                    {o.organizerEvents.length === 0
+                      ? "—"
+                      : o.organizerEvents.map((l) => l.event.title).join(", ")}
+                  </td>
+                  <td className="px-6 py-3">
+                    {o.deactivatedAt ? (
+                      <span className="text-xs font-medium text-gray-500">Inactive</span>
+                    ) : o.emailVerifiedAt ? (
+                      <span className="text-xs font-medium text-green-700">Verified</span>
+                    ) : (
+                      <span className="text-xs font-medium text-yellow-700">
+                        Unverified
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-3 text-right">
+                    <form action={setActiveAction}>
+                      <input type="hidden" name="userId" value={o.id} />
+                      <input
+                        type="hidden"
+                        name="active"
+                        value={o.deactivatedAt ? "true" : "false"}
+                      />
+                      <button
+                        type="submit"
+                        className={`text-sm font-medium hover:underline ${
+                          o.deactivatedAt ? "text-green-700" : "text-red-600"
+                        }`}
+                      >
+                        {o.deactivatedAt ? "Reactivate" : "Deactivate"}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,9 @@ import {
   deleteEventAction,
   editEventAction,
 } from "@/actions/events";
+import { setEventOrganizersAction } from "@/actions/organizers";
+import { listOrganizers } from "@/lib/services/organizer-service";
+import { db } from "@/lib/db";
 import { SlotRows } from "@/components/forms/SlotRows";
 import { SubmitButton } from "@/components/SubmitButton";
 import { HOUR_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
@@ -26,6 +29,15 @@ export default async function EditEventPage({
   const eventId = Number(id);
   const event = await getEventForEdit(eventId);
   if (!event) notFound();
+
+  const [organizers, linkedRows] = await Promise.all([
+    listOrganizers(),
+    db.organizerEvent.findMany({
+      where: { eventId },
+      select: { organizerId: true },
+    }),
+  ]);
+  const linkedIds = new Set(linkedRows.map((l) => l.organizerId));
 
   const toInput = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -171,6 +183,50 @@ export default async function EditEventPage({
         </div>
 
         <SubmitButton pendingText="Saving…">Save Changes</SubmitButton>
+      </form>
+
+      <form
+        action={setEventOrganizersAction}
+        className="space-y-4 rounded-xl bg-white p-6 shadow-sm"
+      >
+        <input type="hidden" name="eventId" value={event.id} />
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Partner organizers</h2>
+          <p className="text-sm text-gray-500">
+            Organizer accounts checked here can open this event and take
+            attendance from their own login.
+          </p>
+        </div>
+        {organizers.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            No organizer accounts yet — create an organizer invite from the
+            Invites page.
+          </p>
+        ) : (
+          <>
+            <ul className="divide-y divide-gray-100">
+              {organizers.map((o) => (
+                <li key={o.id} className="flex items-center gap-3 py-2.5">
+                  <input
+                    type="checkbox"
+                    id={`org-${o.id}`}
+                    name="organizerIds"
+                    value={o.id}
+                    defaultChecked={linkedIds.has(o.id)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor={`org-${o.id}`} className="text-sm text-gray-900">
+                    <span className="font-medium">
+                      {o.firstName} {o.lastName}
+                    </span>{" "}
+                    <span className="text-gray-500">· {o.email}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <SubmitButton pendingText="Saving…">Save Organizers</SubmitButton>
+          </>
+        )}
       </form>
 
       <div className="flex flex-wrap gap-3 rounded-xl bg-white p-6 shadow-sm">

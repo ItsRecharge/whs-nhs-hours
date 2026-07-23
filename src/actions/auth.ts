@@ -58,7 +58,13 @@ export async function loginAction(
   if (typeof next === "string" && next.startsWith("/") && !next.startsWith("//")) {
     redirect(next);
   }
-  redirect(result.user.role === "officer" ? "/officer/dashboard" : "/member/dashboard");
+  redirect(
+    result.user.role === "officer"
+      ? "/officer/dashboard"
+      : result.user.role === "organizer"
+        ? "/organizer/dashboard"
+        : "/member/dashboard",
+  );
 }
 
 export async function logoutAction(): Promise<void> {

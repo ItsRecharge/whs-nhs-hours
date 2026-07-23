@@ -3,7 +3,7 @@ import { SESSION_COOKIE } from "@/lib/constants";
 import { verifySessionToken } from "@/lib/session-token";
 
 export const config = {
-  matcher: ["/member/:path*", "/officer/:path*"],
+  matcher: ["/member/:path*", "/officer/:path*", "/organizer/:path*"],
 };
 
 export async function middleware(req: NextRequest) {
@@ -16,8 +16,22 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (req.nextUrl.pathname.startsWith("/officer") && session.role !== "officer") {
-    return NextResponse.redirect(new URL("/member/dashboard", req.url));
+  const path = req.nextUrl.pathname;
+  const home =
+    session.role === "officer"
+      ? "/officer/dashboard"
+      : session.role === "organizer"
+        ? "/organizer/dashboard"
+        : "/member/dashboard";
+
+  if (path.startsWith("/officer") && session.role !== "officer") {
+    return NextResponse.redirect(new URL(home, req.url));
+  }
+  if (path.startsWith("/organizer") && session.role !== "organizer") {
+    return NextResponse.redirect(new URL(home, req.url));
+  }
+  if (path.startsWith("/member") && session.role === "organizer") {
+    return NextResponse.redirect(new URL(home, req.url));
   }
 
   return NextResponse.next();

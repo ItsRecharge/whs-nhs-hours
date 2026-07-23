@@ -20,7 +20,13 @@ export async function requireUser(role?: Role): Promise<User> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (role && user.role !== role) {
-    redirect(user.role === "officer" ? "/officer/dashboard" : "/member/dashboard");
+    redirect(
+      user.role === "officer"
+        ? "/officer/dashboard"
+        : user.role === "organizer"
+          ? "/organizer/dashboard"
+          : "/member/dashboard",
+    );
   }
   return user;
 }
