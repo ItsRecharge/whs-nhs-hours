@@ -70,6 +70,8 @@ export async function markAttendanceAction(formData: FormData): Promise<void> {
             source: `Event: ${c.eventTitle}`,
             date: new Date(),
             recordedBy: fullName(actor),
+            category: c.eventCategory,
+            origin: "inside",
           };
         }),
       );

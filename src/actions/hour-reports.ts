@@ -100,6 +100,8 @@ async function reviewAction(formData: FormData, approve: boolean): Promise<void>
             source: `Report: ${reviewed.description}`,
             date: reviewed.date,
             recordedBy: fullName(officer),
+            category: reviewed.category,
+            origin: reviewed.origin,
           },
         ]);
       }

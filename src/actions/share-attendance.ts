@@ -66,6 +66,8 @@ export async function markShareAttendanceAction(formData: FormData): Promise<voi
             source: `Event: ${c.eventTitle}`,
             date: new Date(),
             recordedBy: `Organizer: ${organizerName}`,
+            category: c.eventCategory,
+            origin: "inside",
           };
         }),
       );

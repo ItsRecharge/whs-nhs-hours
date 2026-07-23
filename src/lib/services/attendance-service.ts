@@ -4,6 +4,7 @@ export interface AttendanceCredit {
   userId: number;
   hours: number;
   eventTitle: string;
+  eventCategory: string;
 }
 
 /**
@@ -21,7 +22,10 @@ export async function markSlotAttendance(
 ): Promise<{ credited: AttendanceCredit[]; eventTitle: string } | null> {
   const timeslot = await db.timeslot.findUnique({
     where: { id: timeslotId },
-    include: { signups: true, event: { select: { id: true, title: true } } },
+    include: {
+      signups: true,
+      event: { select: { id: true, title: true, category: true } },
+    },
   });
   if (!timeslot) return null;
 
@@ -65,6 +69,7 @@ export async function markSlotAttendance(
       userId: s.userId,
       hours: timeslot.hoursValue,
       eventTitle: timeslot.event.title,
+      eventCategory: timeslot.event.category,
     })),
   };
 }

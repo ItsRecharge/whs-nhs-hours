@@ -39,15 +39,24 @@ export interface HoursRow {
   hours: number;
   source: string; // e.g. "Event: Spring Concert"
   date: Date;
-  recordedBy?: string; // officer who credited the hours
+  recordedBy?: string; // officer/organizer who credited the hours
+  category?: string; // general | tutoring | soup_kitchen | gardening
+  origin?: string; // inside | outside
 }
 
 export interface RosterRow {
   name: string;
   email: string;
   gradYear: string; // "" when unknown
-  hoursCompleted: number;
+  house: string; // "" when unassigned
+  inside: number;
+  outside: number;
+  outsideCounted: number;
+  hoursCompleted: number; // counted total (inside + capped outside)
   remaining: number;
+  tutoring: boolean;
+  soupKitchen: boolean;
+  gardening: boolean;
   events: string; // semicolon-joined list of sources
 }
 
@@ -61,10 +70,19 @@ const ROSTER_HEADER = [
   "Member",
   "Email",
   "Grad year",
-  "Hours completed",
+  "House",
+  "Inside hours",
+  "Outside hours",
+  "Outside counted",
+  "Total hours",
   "Hours remaining",
+  "Tutoring",
+  "Soup Kitchen",
+  "Gardening",
   "Events participated in",
 ];
+
+const yn = (v: boolean) => (v ? "Yes" : "No");
 
 let warned = false;
 
@@ -134,7 +152,7 @@ export async function appendHoursRows(rows: HoursRow[]): Promise<void> {
     await withRetry(() =>
       sheets.spreadsheets.values.append({
         spreadsheetId: config.spreadsheetId,
-        range: `${config.logTab}!A:F`,
+        range: `${config.logTab}!A:H`,
         valueInputOption: "USER_ENTERED",
         requestBody: {
           values: rows.map((r) => [
@@ -144,6 +162,8 @@ export async function appendHoursRows(rows: HoursRow[]): Promise<void> {
             r.source,
             r.date.toISOString().slice(0, 10),
             r.recordedBy ?? "",
+            r.category ?? "general",
+            r.origin ?? "inside",
           ]),
         },
       }),
@@ -172,7 +192,7 @@ export async function syncRosterSheet(rows: RosterRow[]): Promise<SheetWriteResu
     await withRetry(() =>
       sheets.spreadsheets.values.clear({
         spreadsheetId: config.spreadsheetId,
-        range: `${config.rosterTab}!A:F`,
+        range: `${config.rosterTab}!A:M`,
       }),
     );
     await withRetry(() =>
@@ -187,8 +207,15 @@ export async function syncRosterSheet(rows: RosterRow[]): Promise<SheetWriteResu
               r.name,
               r.email,
               r.gradYear,
+              r.house,
+              r.inside,
+              r.outside,
+              r.outsideCounted,
               r.hoursCompleted,
               r.remaining,
+              yn(r.tutoring),
+              yn(r.soupKitchen),
+              yn(r.gardening),
               r.events,
             ]),
           ],
