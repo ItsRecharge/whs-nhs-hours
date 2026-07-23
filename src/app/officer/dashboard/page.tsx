@@ -10,23 +10,29 @@ import {
   Users,
 } from "lucide-react";
 import { requireUser } from "@/lib/current-user";
-import { listMembersWithProgress } from "@/lib/services/member-service";
+import {
+  graduatedSeniorInfo,
+  listMembersWithProgress,
+} from "@/lib/services/member-service";
 import { getTotalGoal } from "@/lib/services/chapter-service";
 import { listEvents, listPendingRequests } from "@/lib/services/event-service";
 import { listPendingReports } from "@/lib/services/hour-report-service";
 import { sendHoursSummaryAction } from "@/actions/reminders";
 import { ProgressBar } from "@/components/ProgressBar";
+import { GraduatesBanner } from "@/components/GraduatesBanner";
 import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function OfficerDashboard() {
   await requireUser("officer");
-  const [members, goal, pendingRequests, pendingReports, events] = await Promise.all([
-    listMembersWithProgress(),
-    getTotalGoal(),
-    listPendingRequests(),
-    listPendingReports(),
-    listEvents(),
-  ]);
+  const [members, goal, pendingRequests, pendingReports, events, graduates] =
+    await Promise.all([
+      listMembersWithProgress(),
+      getTotalGoal(),
+      listPendingRequests(),
+      listPendingReports(),
+      listEvents(),
+      graduatedSeniorInfo(),
+    ]);
 
   const active = members.filter((m) => !m.deactivatedAt);
   const hitGoal = active.filter((m) => m.remaining <= 0).length;
@@ -95,6 +101,9 @@ export default async function OfficerDashboard() {
 
   return (
     <div className="space-y-6">
+      {graduates.show && (
+        <GraduatesBanner count={graduates.count} cutoffYear={graduates.cutoffYear} />
+      )}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Officer dashboard</h1>
