@@ -1,4 +1,5 @@
 import { requireUser, fullName } from "@/lib/current-user";
+import { HOUR_CATEGORY_LABELS, type HourCategory } from "@/lib/constants";
 import { listPendingRequests } from "@/lib/services/event-service";
 import { listPendingReports } from "@/lib/services/hour-report-service";
 import { approveRequestAction, denyRequestAction } from "@/actions/events";
@@ -92,12 +93,50 @@ export default async function OfficerRequestsPage() {
                     <p className="text-lg font-semibold text-gray-900">
                       {r.description}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {fullName(r.user)} · {formatEventDate(r.date)} ·{" "}
-                      {r.hoursRequested} hrs
+                    <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+                      <span>
+                        {fullName(r.user)} · {formatEventDate(r.date)} ·{" "}
+                        {r.hoursRequested} hrs
+                      </span>
+                      <span
+                        className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                          r.origin === "outside"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {r.origin === "outside" ? "Outside NHS" : "Inside NHS"}
+                      </span>
+                      <span className="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700">
+                        {HOUR_CATEGORY_LABELS[r.category as HourCategory] ?? "General"}
+                      </span>
                     </p>
                     {r.notes && (
                       <p className="mt-2 text-sm text-gray-600">{r.notes}</p>
+                    )}
+                    {r.photoPath ? (
+                      <a
+                        href={`/api/uploads/${r.photoPath}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-block"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/api/uploads/${r.photoPath}`}
+                          alt="Proof photo"
+                          className="max-h-36 rounded-lg border border-gray-200 transition hover:opacity-90"
+                        />
+                        <span className="mt-1 block text-xs text-blue-800 hover:underline">
+                          Open full-size proof photo
+                        </span>
+                      </a>
+                    ) : (
+                      r.origin === "outside" && (
+                        <p className="mt-2 text-xs font-medium text-red-600">
+                          No proof photo attached.
+                        </p>
+                      )
                     )}
                   </div>
                   <div className="flex shrink-0 gap-2">

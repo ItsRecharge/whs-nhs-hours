@@ -1,12 +1,8 @@
 import { requireUser } from "@/lib/current-user";
 import { listReportsForUser } from "@/lib/services/hour-report-service";
-import { reportHoursAction } from "@/actions/hour-reports";
-import { SubmitButton } from "@/components/SubmitButton";
+import { ReportHoursForm } from "@/components/ReportHoursForm";
+import { HOUR_CATEGORY_LABELS, type HourCategory } from "@/lib/constants";
 import { formatEventDate } from "@/lib/format";
-
-const field =
-  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
-const label = "mb-1 block text-sm font-medium text-gray-700";
 
 const REPORT_BADGE: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -28,45 +24,7 @@ export default async function ReportHoursPage() {
         </p>
       </div>
 
-      <form action={reportHoursAction} className="rounded-xl bg-white p-6 shadow-sm">
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="description" className={label}>
-              What did you do?
-            </label>
-            <input id="description" name="description" required className={field} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="date" className={label}>
-                Date
-              </label>
-              <input id="date" name="date" type="date" required className={field} />
-            </div>
-            <div>
-              <label htmlFor="hoursRequested" className={label}>
-                Hours
-              </label>
-              <input
-                id="hoursRequested"
-                name="hoursRequested"
-                type="number"
-                step="0.5"
-                min="0.5"
-                required
-                className={field}
-              />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="notes" className={label}>
-              Notes (optional)
-            </label>
-            <textarea id="notes" name="notes" rows={2} className={field} />
-          </div>
-          <SubmitButton pendingText="Submitting…">Submit for Approval</SubmitButton>
-        </div>
-      </form>
+      <ReportHoursForm />
 
       <section className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-3 text-lg font-semibold text-gray-900">Your reports</h2>
@@ -79,7 +37,9 @@ export default async function ReportHoursPage() {
                 <div>
                   <p className="font-medium text-gray-900">{r.description}</p>
                   <p className="text-sm text-gray-500">
-                    {formatEventDate(r.date)} · {r.hoursRequested} hrs
+                    {formatEventDate(r.date)} · {r.hoursRequested} hrs ·{" "}
+                    {HOUR_CATEGORY_LABELS[r.category as HourCategory] ?? "General"} ·{" "}
+                    {r.origin === "outside" ? "Outside" : "Inside"}
                   </p>
                 </div>
                 <span

@@ -7,6 +7,7 @@ export interface CreateEventInput {
   title: string;
   description?: string;
   location?: string;
+  category?: string;
   slots: TimeslotInput[];
 }
 
@@ -15,6 +16,7 @@ function eventData(input: CreateEventInput) {
     title: input.title,
     description: input.description ?? null,
     location: input.location ?? null,
+    category: input.category ?? "general",
     timeslots: {
       create: input.slots.map((s) => ({
         date: s.date,
@@ -124,7 +126,7 @@ export async function getEventForEdit(eventId: number) {
 
 export async function updateEventMeta(
   eventId: number,
-  meta: { title: string; description?: string; location?: string },
+  meta: { title: string; description?: string; location?: string; category?: string },
 ): Promise<void> {
   await db.event.update({
     where: { id: eventId },
@@ -132,6 +134,7 @@ export async function updateEventMeta(
       title: meta.title,
       description: meta.description ?? null,
       location: meta.location ?? null,
+      ...(meta.category ? { category: meta.category } : {}),
     },
   });
 }

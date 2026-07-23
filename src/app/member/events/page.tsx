@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/current-user";
 import { listActiveEventsForMember } from "@/lib/services/event-service";
 import { signupAction, withdrawAction } from "@/actions/signups";
 import { SubmitButton } from "@/components/SubmitButton";
+import { HOUR_CATEGORY_LABELS, type HourCategory } from "@/lib/constants";
 import { formatSlot } from "@/lib/format";
 
 export default async function MemberEventsPage() {
@@ -20,7 +21,14 @@ export default async function MemberEventsPage() {
         <ul className="space-y-4">
           {events.map((event) => (
             <li key={event.id} className="rounded-xl bg-white p-5 shadow-sm">
-              <p className="text-lg font-semibold text-gray-900">{event.title}</p>
+              <p className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                {event.title}
+                {event.category !== "general" && (
+                  <span className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800">
+                    {HOUR_CATEGORY_LABELS[event.category as HourCategory]}
+                  </span>
+                )}
+              </p>
               {event.location && (
                 <p className="text-sm text-gray-500">{event.location}</p>
               )}

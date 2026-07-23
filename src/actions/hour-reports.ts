@@ -16,6 +16,7 @@ import { fullName } from "@/lib/current-user";
 import { setFlash } from "@/lib/flash";
 import { rateLimit } from "@/lib/rate-limit";
 import { requestIp } from "@/lib/request-ip";
+import { savePhotoUpload } from "@/lib/uploads";
 
 export async function reportHoursAction(formData: FormData): Promise<void> {
   const member = await requireUser("member");
@@ -25,9 +26,31 @@ export async function reportHoursAction(formData: FormData): Promise<void> {
     notes: formData.get("notes") || undefined,
     date: formData.get("date"),
     hoursRequested: formData.get("hoursRequested"),
+    category: formData.get("category"),
+    origin: formData.get("origin"),
   });
   if (!parsed.success) {
     await setFlash("danger", parsed.error.issues[0].message);
+    redirect("/member/report-hours");
+  }
+
+  // Proof rules: outside reports need a photo (message optional); inside
+  // reports need a photo OR a message — at least one.
+  const photo = formData.get("photo");
+  const hasPhoto = photo instanceof File && photo.size > 0;
+  const hasMessage = Boolean(parsed.data.notes?.trim());
+  if (parsed.data.origin === "outside" && !hasPhoto) {
+    await setFlash(
+      "danger",
+      "Outside hours need a proof photo (a portal screenshot, a photo from the event, etc.).",
+    );
+    redirect("/member/report-hours");
+  }
+  if (parsed.data.origin === "inside" && !hasPhoto && !hasMessage) {
+    await setFlash(
+      "danger",
+      "Inside reports need a photo or a message for the reviewing officer — add at least one.",
+    );
     redirect("/member/report-hours");
   }
 
@@ -37,7 +60,17 @@ export async function reportHoursAction(formData: FormData): Promise<void> {
     redirect("/member/report-hours");
   }
 
-  await createReport({ userId: member.id, ...parsed.data });
+  let photoPath: string | null = null;
+  if (hasPhoto) {
+    const saved = await savePhotoUpload(photo);
+    if (!saved.ok) {
+      await setFlash("danger", saved.error);
+      redirect("/member/report-hours");
+    }
+    photoPath = saved.relPath;
+  }
+
+  await createReport({ userId: member.id, ...parsed.data, photoPath });
   await setFlash("success", "Hours submitted for officer approval.");
   revalidatePath("/member/report-hours");
   redirect("/member/report-hours");

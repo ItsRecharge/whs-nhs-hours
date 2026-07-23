@@ -14,6 +14,8 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
+mkdir -p uploads  # proof-photo storage
+
 MARKER="data/.built-commit"
 CURRENT="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
 PREVIOUS="$(cat "$MARKER" 2>/dev/null || echo none)"

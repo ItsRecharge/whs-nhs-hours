@@ -7,6 +7,9 @@ export async function createReport(input: {
   notes?: string;
   date: Date;
   hoursRequested: number;
+  category?: string;
+  origin?: string;
+  photoPath?: string | null;
 }): Promise<HourReport> {
   return db.hourReport.create({
     data: {
@@ -15,6 +18,9 @@ export async function createReport(input: {
       notes: input.notes ?? null,
       date: input.date,
       hoursRequested: input.hoursRequested,
+      category: input.category ?? "general",
+      origin: input.origin ?? "inside",
+      photoPath: input.photoPath ?? null,
       status: "pending",
     },
   });

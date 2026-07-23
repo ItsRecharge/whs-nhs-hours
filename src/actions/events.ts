@@ -55,6 +55,7 @@ function parseEvent<S extends typeof eventSchema | typeof eventRequestSchema>(
     title: formData.get("title"),
     description: formData.get("description") || undefined,
     location: formData.get("location") || undefined,
+    category: formData.get("category") || undefined,
     slots: collectSlots(formData),
   }) as z.SafeParseReturnType<unknown, z.infer<S>>;
 }
@@ -246,6 +247,7 @@ export async function editEventAction(formData: FormData): Promise<void> {
     title,
     description: String(formData.get("description") ?? "").trim() || undefined,
     location: String(formData.get("location") ?? "").trim() || undefined,
+    category: String(formData.get("category") ?? "").trim() || undefined,
   });
 
   const promoted: number[] = [];
