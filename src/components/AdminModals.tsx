@@ -51,6 +51,7 @@ interface Props {
   outsideHoursCap: number;
   schoolYearEndMonth: number;
   schoolYearEndDay: number;
+  publicUrl: string | null;
   houses: { id: number; name: string; sortOrder: number }[];
   integrationStatus: IntegrationStatus;
   emailTestTo: string;
@@ -137,6 +138,7 @@ export function AdminModals({
   outsideHoursCap,
   schoolYearEndMonth,
   schoolYearEndDay,
+  publicUrl,
   houses,
   integrationStatus,
   emailTestTo,
@@ -323,6 +325,23 @@ export function AdminModals({
                   className={field}
                 />
               </div>
+            </div>
+            <div>
+              <label htmlFor="publicUrl" className={label}>
+                Public base URL
+              </label>
+              <input
+                id="publicUrl"
+                name="publicUrl"
+                type="url"
+                placeholder="https://hours.example.org"
+                defaultValue={publicUrl ?? ""}
+                className={field}
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Used in email and share links. Leave blank to use the server&apos;s
+                APP_URL.
+              </p>
             </div>
             <SubmitButton pendingText="Saving…">Save Settings</SubmitButton>
           </form>

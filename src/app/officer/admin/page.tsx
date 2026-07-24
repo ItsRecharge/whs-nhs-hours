@@ -30,6 +30,7 @@ export default async function AdminPage() {
         outsideHoursCap={settings.outsideHoursCap}
         schoolYearEndMonth={settings.schoolYearEndMonth}
         schoolYearEndDay={settings.schoolYearEndDay}
+        publicUrl={settings.publicUrl}
         houses={houses}
         integrationStatus={integrationStatus}
         emailTestTo={officer.email}

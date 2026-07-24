@@ -71,6 +71,13 @@ export async function completeSetupAction(
     publicUrl: null,
   });
 
+  // Wizard installs skip `db:seed`, so the default houses are created here.
+  if ((await db.house.count()) === 0) {
+    await db.house.createMany({
+      data: [1, 2, 3, 4].map((n) => ({ name: `House ${n}`, sortOrder: n })),
+    });
+  }
+
   if (data.gmailUser && data.gmailAppPassword) {
     await updateMailConfig({
       user: data.gmailUser,
