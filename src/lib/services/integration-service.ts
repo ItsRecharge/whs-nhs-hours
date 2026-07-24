@@ -115,16 +115,19 @@ export async function updateMailConfig(input: {
   user: string;
   appPassword: string;
 }): Promise<void> {
+  // Google displays app passwords grouped ("abcd efgh …") but SMTP auth
+  // requires them without spaces — strip whitespace so pasting either works.
+  const appPassword = input.appPassword.replace(/\s+/g, "");
   await db.integrationSettings.upsert({
     where: { id: 1 },
     update: {
       gmailUser: input.user,
-      gmailAppPasswordEnc: encryptSecret(input.appPassword),
+      gmailAppPasswordEnc: encryptSecret(appPassword),
     },
     create: {
       id: 1,
       gmailUser: input.user,
-      gmailAppPasswordEnc: encryptSecret(input.appPassword),
+      gmailAppPasswordEnc: encryptSecret(appPassword),
     },
   });
 }
