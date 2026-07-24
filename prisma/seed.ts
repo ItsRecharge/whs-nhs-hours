@@ -15,7 +15,9 @@ async function seedHouses() {
   const count = await db.house.count();
   if (count > 0) return;
   await db.house.createMany({
-    data: [1, 2, 3, 4].map((n) => ({ name: `House ${n}`, sortOrder: n })),
+    data: ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"].map(
+      (name, i) => ({ name, sortOrder: i + 1 }),
+    ),
   });
   console.log("Seeded 4 houses");
 }
