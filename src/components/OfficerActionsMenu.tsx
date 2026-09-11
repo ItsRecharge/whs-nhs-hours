@@ -9,9 +9,11 @@ import {
   MoreVertical,
   Pencil,
   Power,
+  ShieldOff,
   UserCog,
 } from "lucide-react";
 import {
+  revokeAdminAction,
   sendPasswordResetForUserAction,
   setOfficerActiveAction,
 } from "@/actions/officers";
@@ -20,7 +22,8 @@ import { startImpersonationAction } from "@/actions/impersonation";
 interface OfficerActionsMenuProps {
   officerId: number;
   active: boolean;
-  protectedNow: boolean;
+  /** Target holds the admin role (and is therefore protected from removal). */
+  isAdmin: boolean;
   meIsBootstrap: boolean;
 }
 
@@ -30,9 +33,10 @@ const itemClass =
 export function OfficerActionsMenu({
   officerId,
   active,
-  protectedNow,
+  isAdmin,
   meIsBootstrap,
 }: OfficerActionsMenuProps) {
+  const protectedNow = isAdmin;
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{
     right: number;
@@ -159,6 +163,19 @@ export function OfficerActionsMenu({
             </button>
           </form>
 
+          {meIsBootstrap && isAdmin ? (
+            <>
+              <div className="my-1 border-t border-gray-100" />
+              <form action={revokeAdminAction}>
+                <input type="hidden" name="userId" value={officerId} />
+                <button type="submit" className={`${itemClass} text-amber-800`}>
+                  <ShieldOff className="h-3.5 w-3.5" />
+                  Remove admin role
+                </button>
+              </form>
+            </>
+          ) : null}
+
           <div className="my-1 border-t border-gray-100" />
           <form action={setOfficerActiveAction}>
             <input type="hidden" name="userId" value={officerId} />
@@ -168,7 +185,7 @@ export function OfficerActionsMenu({
               disabled={protectedNow}
               title={
                 protectedNow
-                  ? "Transfer the bootstrap role before removing this officer."
+                  ? "Remove this officer's admin role before deactivating them."
                   : undefined
               }
               className={

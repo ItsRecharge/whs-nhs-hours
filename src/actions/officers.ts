@@ -11,6 +11,12 @@ import {
   setMemberActive,
 } from "@/lib/services/roster-service";
 import { getPublicBaseUrl } from "@/lib/services/chapter-service";
+import {
+  grantAdmin,
+  revokeAdmin,
+  LastAdminError,
+  NotAnOfficerError,
+} from "@/lib/services/bootstrap-service";
 import { verifyPassword } from "@/lib/services/auth-service";
 import { recordAudit } from "@/lib/services/audit-service";
 import { sendMail } from "@/lib/email/mailer";
@@ -93,7 +99,7 @@ export async function sendPasswordResetForUserAction(formData: FormData): Promis
   redirect(OFFICERS_PATH);
 }
 
-/** Deactivate / reactivate an officer. Bootstrap officer is protected for year one. */
+/** Deactivate / reactivate an officer. Admins are protected until their role is removed. */
 export async function setOfficerActiveAction(formData: FormData): Promise<void> {
   const officer = await requireUser("officer");
   const userId = Number(formData.get("userId"));
@@ -127,14 +133,13 @@ export async function setOfficerActiveAction(formData: FormData): Promise<void> 
 }
 
 /**
- * Hands the bootstrap (master admin) role to another officer. Only the current
- * bootstrap officer may do this, confirmed with their password. Exactly one
- * bootstrap officer exists at a time.
+ * Grants the admin role to another active officer. Only an admin may do this,
+ * confirmed with their own password. Any number of admins may exist.
  */
-export async function transferBootstrapAction(formData: FormData): Promise<void> {
+export async function grantAdminAction(formData: FormData): Promise<void> {
   const officer = await requireUser("officer");
   if (!officer.isBootstrapOfficer) {
-    await setFlash("danger", "Only the admin can transfer the role.");
+    await setFlash("danger", "Only an admin can add admins.");
     redirect(OFFICERS_PATH);
   }
 
@@ -146,25 +151,69 @@ export async function transferBootstrapAction(formData: FormData): Promise<void>
     redirect(OFFICERS_PATH);
   }
 
-  const target = await db.user.findUnique({ where: { id: targetId } });
-  if (!target || target.role !== "officer" || target.deactivatedAt || target.id === officer.id) {
-    await setFlash("warning", "Pick an active officer to receive the admin role.");
-    redirect(OFFICERS_PATH);
+  let target;
+  try {
+    target = await grantAdmin(targetId);
+  } catch (err) {
+    if (err instanceof NotAnOfficerError) {
+      await setFlash("warning", "Pick an active officer to make an admin.");
+      redirect(OFFICERS_PATH);
+    }
+    throw err;
   }
-
-  await db.$transaction([
-    db.user.update({ where: { id: officer.id }, data: { isBootstrapOfficer: false } }),
-    db.user.update({ where: { id: target.id }, data: { isBootstrapOfficer: true } }),
-  ]);
 
   await recordAudit({
     actor: officer,
-    action: "bootstrap.transfer",
-    summary: `Transferred the admin role to ${fullName(target)}`,
+    action: "admin.grant",
+    summary: `Made ${fullName(target)} an admin`,
     targetType: "user",
     targetId: target.id,
   });
-  await setFlash("success", `${target.firstName} is now the admin.`);
+  await setFlash("success", `${target.firstName} is now an admin.`);
+  revalidatePath(OFFICERS_PATH);
+  redirect(OFFICERS_PATH);
+}
+
+/**
+ * Removes the admin role from another admin. Only an admin may do this; you
+ * can't remove your own admin role, and the last admin can never be removed.
+ */
+export async function revokeAdminAction(formData: FormData): Promise<void> {
+  const officer = await requireUser("officer");
+  if (!officer.isBootstrapOfficer) {
+    await setFlash("danger", "Only an admin can remove admins.");
+    redirect(OFFICERS_PATH);
+  }
+
+  const targetId = Number(formData.get("userId"));
+  if (targetId === officer.id) {
+    await setFlash("warning", "You can't remove your own admin role. Ask another admin.");
+    redirect(OFFICERS_PATH);
+  }
+
+  let target;
+  try {
+    target = await revokeAdmin(targetId);
+  } catch (err) {
+    if (err instanceof LastAdminError) {
+      await setFlash("warning", err.message);
+      redirect(OFFICERS_PATH);
+    }
+    if (err instanceof NotAnOfficerError) {
+      await setFlash("danger", "That account no longer exists.");
+      redirect(OFFICERS_PATH);
+    }
+    throw err;
+  }
+
+  await recordAudit({
+    actor: officer,
+    action: "admin.revoke",
+    summary: `Removed ${fullName(target)}'s admin role`,
+    targetType: "user",
+    targetId: target.id,
+  });
+  await setFlash("info", `${target.firstName} is no longer an admin.`);
   revalidatePath(OFFICERS_PATH);
   redirect(OFFICERS_PATH);
 }

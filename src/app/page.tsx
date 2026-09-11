@@ -36,7 +36,7 @@ export default async function LandingPage() {
         </div>
 
         <h1 className="text-5xl leading-tight font-black tracking-tight text-white">
-          Aberjona NHS
+          Winchester NHS
         </h1>
         <h2 className="mt-1 text-2xl font-light tracking-[2px] text-white/70 uppercase">
           Hours Log

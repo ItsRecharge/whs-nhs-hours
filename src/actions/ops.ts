@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { recordAudit } from "@/lib/services/audit-service";
 import { verifyPassword } from "@/lib/services/auth-service";
-import { getBootstrapOfficer } from "@/lib/services/bootstrap-service";
+import { listAdmins } from "@/lib/services/bootstrap-service";
 import { requireUser } from "@/lib/current-user";
 import { requireOpsGrant, isOpsConsoleEnabled } from "@/lib/ops-access";
 import { signOpsGrant } from "@/lib/ops-grant";
@@ -48,12 +48,20 @@ export async function requestOpsGrantAction(formData: FormData): Promise<void> {
     redirect("/officer/ops");
   }
 
-  // The console is visible to every officer, but only the bootstrap officer's
-  // password unlocks it — so we verify against the bootstrap account, not the
-  // current user.
-  const bootstrap = await getBootstrapOfficer();
-  if (!bootstrap || !(await verifyPassword(bootstrap.passwordHash, password))) {
-    await setFlash("danger", "That is not the admin's password.");
+  // The console is visible to every officer, but only an admin's password
+  // unlocks it — so we verify against the admin accounts, not the current user.
+  // The caller's own account is checked first when they are an admin.
+  const admins = await listAdmins();
+  admins.sort((a, b) => (a.id === user.id ? -1 : b.id === user.id ? 1 : 0));
+  let unlocked = false;
+  for (const admin of admins) {
+    if (await verifyPassword(admin.passwordHash, password)) {
+      unlocked = true;
+      break;
+    }
+  }
+  if (!unlocked) {
+    await setFlash("danger", "That is not an admin's password.");
     redirect("/officer/ops");
   }
 

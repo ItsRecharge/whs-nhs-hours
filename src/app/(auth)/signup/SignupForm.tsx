@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { signupAction, type SignupFormState } from "@/actions/signup";
 import { SubmitButton } from "@/components/SubmitButton";
 import { fieldClass, labelClass } from "@/components/AuthShell";
+import { STUDENT_EMAIL_DOMAIN } from "@/lib/constants";
 
 export function SignupForm({
   inviteToken,
@@ -41,7 +42,19 @@ export function SignupForm({
         <label htmlFor="email" className={labelClass}>
           Email
         </label>
-        <input id="email" name="email" type="email" required className={fieldClass} />
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          placeholder={askGrade ? `you@${STUDENT_EMAIL_DOMAIN}` : undefined}
+          className={fieldClass}
+        />
+        {askGrade && (
+          <p className="mt-1 text-xs text-gray-500">
+            Use your @{STUDENT_EMAIL_DOMAIN} school email.
+          </p>
+        )}
       </div>
       {askGrade && (
         <div>

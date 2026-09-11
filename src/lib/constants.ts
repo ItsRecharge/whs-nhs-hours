@@ -57,3 +57,6 @@ export const VERIFICATION_TOKEN_TTL_MS = 48 * 60 * 60 * 1000; // 48h
 export const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1h
 export const OPS_GRANT_TTL_SECONDS = 10 * 60; // 10 min
 export const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+
+// Students (member-role signups) must use their school Google account.
+export const STUDENT_EMAIL_DOMAIN = "wpsstudent.com";

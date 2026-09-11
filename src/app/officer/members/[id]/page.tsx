@@ -198,8 +198,8 @@ export default async function MemberDetailPage({
           <h2 className="mb-4 text-lg font-semibold text-gray-900">Manage</h2>
           {bootstrapProtected ? (
             <p className="mb-4 text-sm text-amber-700">
-              This is the admin account. Transfer the admin role to
-              another officer before it can be demoted or removed.
+              This is an admin account. Remove its admin role (Officers page)
+              before it can be demoted or removed.
             </p>
           ) : null}
           <div className="flex flex-wrap gap-3">

@@ -9,6 +9,7 @@ import { sendMail } from "@/lib/email/mailer";
 import { verificationEmail } from "@/lib/email/templates";
 import { getPublicBaseUrl } from "@/lib/services/chapter-service";
 import { setFlash } from "@/lib/flash";
+import { STUDENT_EMAIL_DOMAIN } from "@/lib/constants";
 import { rateLimit } from "@/lib/rate-limit";
 import { requestIp } from "@/lib/request-ip";
 
@@ -55,6 +56,10 @@ export async function signupAction(
         return { error: "This invite link has reached its usage limit." };
       case "grade_required":
         return { error: "Select your grade (junior or senior)." };
+      case "email_domain":
+        return {
+          error: `Students must sign up with their @${STUDENT_EMAIL_DOMAIN} school email.`,
+        };
       default:
         return { error: "This invite link is invalid or has expired." };
     }

@@ -14,7 +14,7 @@ export interface OfficerRow {
   createdAt: Date;
 }
 
-/** Every officer account. The bootstrap officer is protected until the role is handed off. */
+/** Every officer account. Admins are protected until their admin role is removed. */
 export async function listOfficers(): Promise<OfficerRow[]> {
   return db.user.findMany({
     where: { role: "officer" },
@@ -33,7 +33,7 @@ export async function listOfficers(): Promise<OfficerRow[]> {
 
 export class BootstrapOfficerProtectionError extends Error {
   constructor() {
-    super("The admin cannot be changed during the first year.");
+    super("Admins can't be demoted or removed. Remove their admin role first.");
     this.name = "BootstrapOfficerProtectionError";
   }
 }

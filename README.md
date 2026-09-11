@@ -22,6 +22,9 @@ Hours Log and adapted to NHS rules.
 - **Self-report proof**: outside reports require a photo (portal screenshot,
   event photo, …), message optional; inside reports (an NHS event you forgot to
   log) need a photo **or** a message. Officers see the photo in the approval queue.
+- **Student emails only**: member-role signups must use an `@wpsstudent.com`
+  address (`STUDENT_EMAIL_DOMAIN` in `src/lib/constants.ts`). Officer and
+  organizer invites accept any domain.
 - **Houses**: members are split into 4 houses (names configurable). New signups
   are unassigned until an officer assigns them (member page or bulk bar).
 - **Grad-year cohorts**: members pick Junior/Senior at signup (stored as a
@@ -89,8 +92,13 @@ broadcasts are sent BCC in chunks to stay within it.
 
 1. Log in with the admin account (or complete the setup wizard).
 2. Go to **Invites** → create an invite link (Member, Officer, or Organizer).
-3. Members pick Junior/Senior at signup → verify email → log in.
-4. Officers assign houses, create typed events, approve hour reports (with proof
+   Leave the email field blank to just get a link to copy, or enter one or
+   more comma-separated addresses to have the link emailed.
+3. There can be any number of admins: on **Officers**, an admin can make
+   another officer an admin (password-confirmed) or remove another admin's
+   role. The last admin can never be removed.
+4. Members pick Junior/Senior at signup → verify email → log in.
+5. Officers assign houses, create typed events, approve hour reports (with proof
    photos), and watch progress toward the 30-hour goal.
 
 ## Tests

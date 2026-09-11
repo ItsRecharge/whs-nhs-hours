@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser, fullName } from "@/lib/current-user";
-import { inviteSchema } from "@/lib/validation";
+import { inviteSchema, parseEmailList } from "@/lib/validation";
 import { createInvite, revokeInvite } from "@/lib/services/invite-service";
 import { getChapterSettings, getPublicBaseUrl } from "@/lib/services/chapter-service";
 import { sendMail } from "@/lib/email/mailer";
@@ -23,6 +23,22 @@ export async function createInviteAction(formData: FormData): Promise<void> {
     redirect("/officer/invites");
   }
 
+  // Optional recipients: one or many, separated by commas (or ; / whitespace).
+  const { emails: recipients, invalid } = parseEmailList(
+    String(formData.get("email") ?? ""),
+  );
+  if (invalid.length > 0) {
+    await setFlash("danger", `Not a valid email: ${invalid.join(", ")}`);
+    redirect("/officer/invites");
+  }
+  if (parsed.data.maxUses !== undefined && parsed.data.maxUses < recipients.length) {
+    await setFlash(
+      "danger",
+      `Max uses (${parsed.data.maxUses}) is lower than the number of recipients (${recipients.length}). Raise it or leave it blank.`,
+    );
+    redirect("/officer/invites");
+  }
+
   const { invite, rawToken } = await createInvite({
     createdById: officer.id,
     role: parsed.data.role,
@@ -32,17 +48,31 @@ export async function createInviteAction(formData: FormData): Promise<void> {
 
   const link = `${await getPublicBaseUrl()}/signup?invite=${rawToken}`;
 
-  const sendTo = String(formData.get("email") ?? "").trim().toLowerCase();
-  if (sendTo) {
-    try {
-      const chapterName = (await getChapterSettings()).chapterName;
-      await sendMail({
-        to: sendTo,
-        ...inviteEmail(link, invite.expiresAt, fullName(officer), chapterName),
-      });
-      await setFlash("success", `Invite created and emailed to ${sendTo}.`);
-    } catch {
-      await setFlash("warning", "Invite created, but the email failed to send.");
+  const failed: string[] = [];
+  if (recipients.length > 0) {
+    const chapterName = (await getChapterSettings()).chapterName;
+    const content = inviteEmail(link, invite.expiresAt, fullName(officer), chapterName);
+    const results = await Promise.allSettled(
+      recipients.map((to) => sendMail({ to, ...content })),
+    );
+    results.forEach((r, i) => {
+      if (r.status === "rejected") failed.push(recipients[i]);
+    });
+    const sent = recipients.length - failed.length;
+    if (failed.length === 0) {
+      await setFlash(
+        "success",
+        recipients.length === 1
+          ? `Invite created and emailed to ${recipients[0]}.`
+          : `Invite created and emailed to ${sent} people.`,
+      );
+    } else if (sent === 0) {
+      await setFlash("warning", "Invite created, but the email failed to send. Copy the link below.");
+    } else {
+      await setFlash(
+        "warning",
+        `Invite created and emailed to ${sent} of ${recipients.length}. Failed: ${failed.join(", ")}. Copy the link below.`,
+      );
     }
   } else {
     await setFlash("success", "Invite link created — copy it below to share.");
@@ -51,7 +81,9 @@ export async function createInviteAction(formData: FormData): Promise<void> {
   await recordAudit({
     actor: officer,
     action: "invite.create",
-    summary: `Created a ${parsed.data.role} invite${sendTo ? ` for ${sendTo}` : ""}`,
+    summary: `Created a ${parsed.data.role} invite${
+      recipients.length > 0 ? ` for ${recipients.join(", ")}` : " link"
+    }`,
     targetType: "invite",
     targetId: invite.id,
   });

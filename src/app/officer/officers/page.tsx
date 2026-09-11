@@ -4,7 +4,7 @@ import { requireUser, fullName } from "@/lib/current-user";
 import { listOfficers } from "@/lib/services/roster-service";
 import { listOrganizers } from "@/lib/services/organizer-service";
 import { setActiveAction } from "@/actions/roster";
-import { transferBootstrapAction } from "@/actions/officers";
+import { grantAdminAction } from "@/actions/officers";
 import { ResetLinkReveal } from "@/components/ResetLinkReveal";
 import { OfficerActionsMenu } from "@/components/OfficerActionsMenu";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -13,7 +13,7 @@ export default async function OfficersPage() {
   const me = await requireUser("officer");
   const [officers, organizers] = await Promise.all([listOfficers(), listOrganizers()]);
   const meIsBootstrap = me.isBootstrapOfficer;
-  const transferTargets = officers.filter(
+  const adminCandidates = officers.filter(
     (o) => !o.isBootstrapOfficer && o.deactivatedAt === null,
   );
 
@@ -30,30 +30,31 @@ export default async function OfficersPage() {
         <h1 className="mt-2 text-2xl font-bold text-gray-900">Officers</h1>
         <p className="text-sm text-gray-500">
           Everyone with officer access. Reset a password or remove an officer as the
-          roster changes. The admin is protected from removal until the
-          role is handed off.
+          roster changes. Admins are protected from removal until their admin
+          role is taken away.
         </p>
       </div>
 
       <ResetLinkReveal />
 
-      {meIsBootstrap && transferTargets.length > 0 ? (
+      {meIsBootstrap && adminCandidates.length > 0 ? (
         <div className="rounded-xl border border-primary-200 bg-primary-50/60 p-5">
           <div className="mb-1 flex items-center gap-2 font-semibold text-gray-900">
             <Crown className="h-4 w-4 text-primary-800" />
-            Transfer admin role
+            Add an admin
           </div>
           <p className="mb-4 text-sm text-gray-600">
-            Hand the admin role to another officer. They become
-            protected from removal; you no longer will be. Confirm with your password.
+            Give another officer full admin powers (edit users, change roles,
+            impersonate, clear the audit log). There can be as many admins as you
+            like. Confirm with your password.
           </p>
           <form
-            action={transferBootstrapAction}
+            action={grantAdminAction}
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
           >
             <div className="flex-1">
               <label htmlFor="targetId" className="mb-1 block text-xs font-medium text-gray-700">
-                New admin
+                Officer
               </label>
               <select
                 id="targetId"
@@ -61,7 +62,7 @@ export default async function OfficersPage() {
                 required
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
               >
-                {transferTargets.map((o) => (
+                {adminCandidates.map((o) => (
                   <option key={o.id} value={o.id}>
                     {fullName(o)} ({o.email})
                   </option>
@@ -80,7 +81,7 @@ export default async function OfficersPage() {
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
               />
             </div>
-            <SubmitButton pendingText="Transferring…">Transfer</SubmitButton>
+            <SubmitButton pendingText="Adding…">Make admin</SubmitButton>
           </form>
         </div>
       ) : null}
@@ -127,7 +128,7 @@ export default async function OfficersPage() {
                     </div>
                     {protectedNow ? (
                       <div className="mt-1 text-xs text-gray-400">
-                        Protected — transfer the role to remove
+                        Protected — remove the admin role first
                       </div>
                     ) : null}
                   </td>
@@ -141,7 +142,7 @@ export default async function OfficersPage() {
                         <OfficerActionsMenu
                           officerId={o.id}
                           active={active}
-                          protectedNow={protectedNow}
+                          isAdmin={o.isBootstrapOfficer}
                           meIsBootstrap={meIsBootstrap}
                         />
                       )}

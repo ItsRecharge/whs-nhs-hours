@@ -57,7 +57,7 @@ describe("signupWithInvite", () => {
     const result = await signupWithInvite({
       firstName: "New",
       lastName: "Member",
-      email: "new@test.local",
+      email: "new@wpsstudent.com",
       password: "password123",
       grade: "junior",
       rawInviteToken: rawToken,
@@ -71,7 +71,7 @@ describe("signupWithInvite", () => {
     expect(tokens).toHaveLength(1);
     expect(tokens[0].type).toBe("email_verification");
 
-    const user = await db.user.findUnique({ where: { email: "new@test.local" } });
+    const user = await db.user.findUnique({ where: { email: "new@wpsstudent.com" } });
     expect(user?.emailVerifiedAt).toBeNull();
     expect(user?.role).toBe("member");
   });
@@ -87,7 +87,7 @@ describe("signupWithInvite", () => {
     await signupWithInvite({
       firstName: "A",
       lastName: "A",
-      email: "a@test.local",
+      email: "a@wpsstudent.com",
       password: "password123",
       grade: "senior",
       rawInviteToken: rawToken,
@@ -99,12 +99,52 @@ describe("signupWithInvite", () => {
     const second = await signupWithInvite({
       firstName: "B",
       lastName: "B",
-      email: "b@test.local",
+      email: "b@wpsstudent.com",
       password: "password123",
       grade: "senior",
       rawInviteToken: rawToken,
     });
     expect(second).toEqual({ ok: false, reason: "invalid_invite" });
+  });
+
+  it("rejects a member signup from outside the student domain", async () => {
+    const officer = await makeOfficer();
+    const { rawToken } = await createInvite({
+      createdById: officer.id,
+      role: "member",
+      expiresInDays: 7,
+    });
+    const result = await signupWithInvite({
+      firstName: "Out",
+      lastName: "Sider",
+      email: "outsider@gmail.com",
+      password: "password123",
+      grade: "junior",
+      rawInviteToken: rawToken,
+    });
+    expect(result).toEqual({ ok: false, reason: "email_domain" });
+    expect(await db.user.count({ where: { email: "outsider@gmail.com" } })).toBe(0);
+    // A rejected attempt doesn't burn an invite use.
+    expect((await db.inviteToken.findFirst())?.useCount).toBe(0);
+  });
+
+  it("lets officer and organizer invites use any email domain", async () => {
+    const officer = await makeOfficer();
+    for (const role of ["officer", "organizer"] as const) {
+      const { rawToken } = await createInvite({
+        createdById: officer.id,
+        role,
+        expiresInDays: 7,
+      });
+      const result = await signupWithInvite({
+        firstName: role,
+        lastName: "X",
+        email: `${role}@example.org`,
+        password: "password123",
+        rawInviteToken: rawToken,
+      });
+      expect(result.ok).toBe(true);
+    }
   });
 
   it("rejects a duplicate email", async () => {
@@ -114,10 +154,19 @@ describe("signupWithInvite", () => {
       role: "member",
       expiresInDays: 7,
     });
+    await db.user.create({
+      data: {
+        firstName: "Existing",
+        lastName: "Student",
+        email: "dup@wpsstudent.com",
+        passwordHash: await hashPassword("password123"),
+        role: "member",
+      },
+    });
     const dup = await signupWithInvite({
       firstName: "Dup",
       lastName: "Licate",
-      email: "officer@test.local",
+      email: "dup@wpsstudent.com",
       password: "password123",
       grade: "senior",
       rawInviteToken: rawToken,

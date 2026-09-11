@@ -23,7 +23,8 @@ export default async function OfficerInvitesPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Invite links</h1>
         <p className="text-sm text-gray-500">
-          Generate links for new members to sign up. Optionally email a link directly.
+          Generate a sign-up link to share however you like, or have it emailed
+          to one or more people at once.
         </p>
       </div>
 
@@ -74,7 +75,19 @@ export default async function OfficerInvitesPage() {
               <label htmlFor="email" className={label}>
                 Email to (optional)
               </label>
-              <input id="email" name="email" type="email" className={field} />
+              <input
+                id="email"
+                name="email"
+                type="text"
+                inputMode="email"
+                autoComplete="off"
+                placeholder="a@wpsstudent.com, b@wpsstudent.com"
+                className={field}
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Separate multiple addresses with commas. Leave blank to just get a
+                link you can copy.
+              </p>
             </div>
           </div>
           <SubmitButton pendingText="Creating…">Create Invite</SubmitButton>

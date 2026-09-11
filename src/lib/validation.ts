@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { HOUR_CATEGORIES, HOUR_ORIGINS, ROLES } from "./constants";
+import { HOUR_CATEGORIES, HOUR_ORIGINS, ROLES, STUDENT_EMAIL_DOMAIN } from "./constants";
 
 export const emailSchema = z
   .string()
@@ -204,3 +204,40 @@ export const adjustHoursSchema = z.object({
     .refine((n) => n !== 0, "Hours can't be zero")
     .refine((n) => Math.abs(n) <= 100, "That's too many hours"),
 });
+
+/** True when `email` (already lowercased) belongs to the student school domain. */
+export function isStudentEmail(email: string): boolean {
+  const at = email.lastIndexOf("@");
+  if (at < 0) return false;
+  return email.slice(at + 1).toLowerCase() === STUDENT_EMAIL_DOMAIN;
+}
+
+export interface EmailListResult {
+  /** Valid, lowercased, de-duplicated addresses in input order. */
+  emails: string[];
+  /** Raw entries that failed validation. */
+  invalid: string[];
+}
+
+/**
+ * Parses a free-form recipient list ("a@x.com, b@x.com; c@x.com") into valid
+ * lowercased addresses. Separators: commas, semicolons, whitespace, newlines.
+ */
+export function parseEmailList(raw: string): EmailListResult {
+  const emails: string[] = [];
+  const invalid: string[] = [];
+  const seen = new Set<string>();
+  for (const part of raw.split(/[\s,;]+/)) {
+    const entry = part.trim();
+    if (!entry) continue;
+    const parsed = emailSchema.safeParse(entry);
+    if (!parsed.success) {
+      invalid.push(entry);
+      continue;
+    }
+    if (seen.has(parsed.data)) continue;
+    seen.add(parsed.data);
+    emails.push(parsed.data);
+  }
+  return { emails, invalid };
+}

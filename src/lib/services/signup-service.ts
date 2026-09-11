@@ -5,12 +5,18 @@ import { gradYearForGrade } from "../hours";
 import { hashPassword } from "./auth-service";
 import { issueAuthToken } from "./token-service";
 import type { Role } from "../constants";
+import { isStudentEmail } from "../validation";
 
 export type SignupResult =
   | { ok: true; userId: number; email: string; firstName: string; verificationToken: string }
   | {
       ok: false;
-      reason: "invalid_invite" | "invite_exhausted" | "email_taken" | "grade_required";
+      reason:
+        | "invalid_invite"
+        | "invite_exhausted"
+        | "email_taken"
+        | "grade_required"
+        | "email_domain";
     };
 
 /**
@@ -19,7 +25,8 @@ export type SignupResult =
  * signups can't exceed maxUses. Returns a verification token to email.
  *
  * Member invites require a grade (junior/senior) which is stored as the
- * computed graduation year; officer/organizer invites ignore it.
+ * computed graduation year; officer/organizer invites ignore it. Members must
+ * also sign up with a school (STUDENT_EMAIL_DOMAIN) address.
  */
 export async function signupWithInvite(params: {
   firstName: string;
@@ -46,6 +53,9 @@ export async function signupWithInvite(params: {
       const isMember = invite.role === "member";
       if (isMember && !params.grade) {
         return { ok: false, reason: "grade_required" } as const;
+      }
+      if (isMember && !isStudentEmail(params.email)) {
+        return { ok: false, reason: "email_domain" } as const;
       }
 
       const user = await tx.user.create({
