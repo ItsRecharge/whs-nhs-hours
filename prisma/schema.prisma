@@ -34,7 +34,6 @@ model User {
   sessions        Session[]
   hourReports     HourReport[]  @relation("ReportOwner")
   reviewedReports HourReport[]  @relation("ReportReviewer")
-  domainDismissals DomainReminderDismissal[]
   shareLinksCreated ShareLink[]
   organizerEvents OrganizerEvent[]
 }
@@ -159,7 +158,6 @@ model ChapterSettings {
   schoolYearEndMonth Int   @default(6) // month the school year ends (senior-deactivation cutoff)
   schoolYearEndDay   Int   @default(30)
   publicUrl       String? // public base URL used in email links; falls back to APP_URL
-  domainReminderSentYear Int? // last Sept-15 cycle year the domain-renewal email was sent
   updatedAt       DateTime @updatedAt
 }
 
@@ -192,17 +190,6 @@ model OrganizerEvent {
   event     Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([organizerId, eventId])
-}
-
-model DomainReminderDismissal {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  year        Int      // calendar year of the Sept-15 cycle
-  dismissedAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, year])
 }
 
 model IntegrationSettings {

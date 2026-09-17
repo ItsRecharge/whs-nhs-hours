@@ -10,12 +10,6 @@ function appUrl(): string {
   return getEnv().APP_URL.replace(/\/$/, "");
 }
 
-/** Cloudflare registration page for the chapter domain. */
-export const RENEWAL_URL =
-  "https://dash.cloudflare.com/fe4e8ca3c07a7eeee80feff9bff4e5c7/domains/registrations/wpsmusicdep.com";
-/** Shared Google account used to sign into Cloudflare ("Sign in with Google"). */
-export const SIGN_IN_EMAIL = "Winchestertri.m@gmail.com";
-
 /** Standard subject prefix for every email: "Aberjona NHS - <specific>". */
 function subject(specific: string): string {
   return `Aberjona NHS - ${specific}`;
@@ -278,22 +272,4 @@ export function hourReportDecisionEmail(
         ),
         text: `Hi ${name}, your report "${description}" was not approved.\n${url}`,
       };
-}
-
-export function domainRenewalEmail(
-  renewalUrl: string = RENEWAL_URL,
-  signInEmail: string = SIGN_IN_EMAIL,
-): EmailContent {
-  const body =
-    `<p>The chapter's website domain <strong>wpsmusicdep.com</strong> is due for its yearly renewal. ` +
-    `Please renew it through Cloudflare so the site stays online.</p>` +
-    `<p>Sign in to Cloudflare with <strong>${signInEmail}</strong> using <strong>"Sign in with Google"</strong>, ` +
-    `then complete the renewal on the registration page.</p>`;
-  return {
-    subject: subject("Renew the chapter domain"),
-    html: layout("Domain renewal reminder", body, { label: "Renew domain", url: renewalUrl }),
-    text:
-      `The chapter domain wpsmusicdep.com is due for renewal.\n\n` +
-      `Sign in to Cloudflare with ${signInEmail} using "Sign in with Google", then renew it here:\n${renewalUrl}`,
-  };
 }

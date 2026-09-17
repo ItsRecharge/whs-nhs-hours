@@ -6,14 +6,7 @@ import { FlashMessages } from "@/components/FlashMessages";
 import { AccountControls } from "@/components/AccountControls";
 import { BottomNav } from "@/components/BottomNav";
 import { BrandLogo } from "@/components/BrandLogo";
-import { DomainRenewalPopup } from "@/components/DomainRenewalPopup";
 import { OFFICER_NAV } from "@/lib/nav";
-import {
-  runDomainReminderCheck,
-  shouldShowDomainPopupFor,
-  RENEWAL_URL,
-  SIGN_IN_EMAIL,
-} from "@/lib/domain-reminder";
 
 export default async function OfficerLayout({
   children,
@@ -22,11 +15,6 @@ export default async function OfficerLayout({
 }) {
   const user = await requireUser("officer");
   const flash = await getFlash();
-
-  // Annual domain-renewal reminder: send this year's email if due, then decide
-  // whether to show this officer the renewal popup.
-  await runDomainReminderCheck();
-  const showDomainPopup = await shouldShowDomainPopupFor(user.id);
 
   return (
     <div className="flex min-h-screen">
@@ -73,9 +61,6 @@ export default async function OfficerLayout({
         <main className="flex-1 px-4 py-6 pb-32 sm:px-6 sm:py-8 md:pb-8">
           <div className="mx-auto max-w-4xl">
             <FlashMessages messages={flash} />
-            {showDomainPopup && (
-              <DomainRenewalPopup renewalUrl={RENEWAL_URL} signInEmail={SIGN_IN_EMAIL} />
-            )}
             {children}
           </div>
         </main>

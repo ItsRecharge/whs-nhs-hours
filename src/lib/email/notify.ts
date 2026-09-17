@@ -5,7 +5,6 @@ import { getPublicBaseUrl, getTotalGoal } from "@/lib/services/chapter-service";
 import { hoursRemaining, schoolYearRange } from "@/lib/hours";
 import { sendMail } from "./mailer";
 import {
-  domainRenewalEmail,
   eventCancelledEmail,
   eventPostedEmail,
   hourReportDecisionEmail,
@@ -152,18 +151,6 @@ export async function notifyNewRequest(
     const recipients = await verifiedEmailsByRole("officer");
     if (recipients.length === 0) return;
     const content = newRequestEmail(eventTitle, requesterName, await getPublicBaseUrl());
-    for (const group of chunk(recipients, BCC_CHUNK)) {
-      await sendMail({ bcc: group, ...content });
-    }
-  });
-}
-
-/** Yearly domain-renewal reminder to every verified, active officer. */
-export async function notifyDomainRenewal(): Promise<void> {
-  await safeSend(async () => {
-    const recipients = await verifiedEmailsByRole("officer");
-    if (recipients.length === 0) return;
-    const content = domainRenewalEmail();
     for (const group of chunk(recipients, BCC_CHUNK)) {
       await sendMail({ bcc: group, ...content });
     }
