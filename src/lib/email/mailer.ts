@@ -42,3 +42,47 @@ export async function sendMail(msg: MailMessage): Promise<boolean> {
   });
   return true;
 }
+
+export interface BatchResult {
+  unconfigured: boolean;
+  sent: number;
+  failed: string[];
+}
+
+/**
+ * Sends one message per recipient, one at a time over a single SMTP
+ * connection. Firing many sends in parallel opens a Gmail login per message,
+ * which Gmail throttles/rejects. Never throws; failures are logged and returned.
+ */
+export async function sendMailBatch(
+  recipients: string[],
+  content: Omit<MailMessage, "to" | "bcc">,
+): Promise<BatchResult> {
+  const config = await getMailConfig();
+  if (!config) {
+    console.warn("[mailer] No mail config (DB or env) — batch not sent.");
+    return { unconfigured: true, sent: 0, failed: [] };
+  }
+
+  const transport = nodemailer.createTransport({
+    service: "gmail",
+    pool: true,
+    maxConnections: 1,
+    auth: { user: config.user, pass: config.pass },
+  });
+
+  const failed: string[] = [];
+  try {
+    for (const to of recipients) {
+      try {
+        await transport.sendMail({ from: config.user, to, ...content });
+      } catch (err) {
+        console.error(`[mailer] batch send to ${to} failed:`, err);
+        failed.push(to);
+      }
+    }
+  } finally {
+    transport.close();
+  }
+  return { unconfigured: false, sent: recipients.length - failed.length, failed };
+}

@@ -33,12 +33,17 @@ export async function signupAction(
     return { error: parsed.error.issues[0].message };
   }
 
+  const { firstName, lastName, email, password, grade, inviteToken } = parsed.data;
+
+  // Per-email limit, plus a loose per-IP backstop: a whole class signs up from
+  // one school IP (or "unknown" if the proxy drops X-Forwarded-For).
   const ip = await requestIp();
-  if (!rateLimit(`signup:${ip}`, 5, 60 * 60 * 1000)) {
+  if (
+    !rateLimit(`signup:${email}`, 5, 60 * 60 * 1000) ||
+    !rateLimit(`signup-ip:${ip}`, 200, 60 * 60 * 1000)
+  ) {
     return { error: "Too many sign-up attempts. Please try again later." };
   }
-
-  const { firstName, lastName, email, password, grade, inviteToken } = parsed.data;
   const result = await signupWithInvite({
     firstName,
     lastName,

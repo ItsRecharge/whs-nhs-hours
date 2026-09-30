@@ -6,7 +6,7 @@ import { requireUser, fullName } from "@/lib/current-user";
 import { inviteSchema, parseEmailList } from "@/lib/validation";
 import { createInvite, revokeInvite } from "@/lib/services/invite-service";
 import { getChapterSettings, getPublicBaseUrl } from "@/lib/services/chapter-service";
-import { sendMail } from "@/lib/email/mailer";
+import { sendMailBatch } from "@/lib/email/mailer";
 import { inviteEmail } from "@/lib/email/templates";
 import { recordAudit } from "@/lib/services/audit-service";
 import { setFlash } from "@/lib/flash";
@@ -48,18 +48,16 @@ export async function createInviteAction(formData: FormData): Promise<void> {
 
   const link = `${await getPublicBaseUrl()}/signup?invite=${rawToken}`;
 
-  const failed: string[] = [];
   if (recipients.length > 0) {
     const chapterName = (await getChapterSettings()).chapterName;
     const content = inviteEmail(link, invite.expiresAt, fullName(officer), chapterName);
-    const results = await Promise.allSettled(
-      recipients.map((to) => sendMail({ to, ...content })),
-    );
-    results.forEach((r, i) => {
-      if (r.status === "rejected") failed.push(recipients[i]);
-    });
-    const sent = recipients.length - failed.length;
-    if (failed.length === 0) {
+    const { unconfigured, sent, failed } = await sendMailBatch(recipients, content);
+    if (unconfigured) {
+      await setFlash(
+        "warning",
+        "Invite created, but email isn't set up, so nothing was sent. Copy the link below.",
+      );
+    } else if (failed.length === 0) {
       await setFlash(
         "success",
         recipients.length === 1
@@ -69,9 +67,12 @@ export async function createInviteAction(formData: FormData): Promise<void> {
     } else if (sent === 0) {
       await setFlash("warning", "Invite created, but the email failed to send. Copy the link below.");
     } else {
+      // Flash lives in a cookie (~4 KB) — don't list every failure.
+      const shown = failed.slice(0, 10).join(", ");
+      const more = failed.length > 10 ? ` and ${failed.length - 10} more` : "";
       await setFlash(
         "warning",
-        `Invite created and emailed to ${sent} of ${recipients.length}. Failed: ${failed.join(", ")}. Copy the link below.`,
+        `Invite created and emailed to ${sent} of ${recipients.length}. Failed: ${shown}${more}. Copy the link below.`,
       );
     }
   } else {
