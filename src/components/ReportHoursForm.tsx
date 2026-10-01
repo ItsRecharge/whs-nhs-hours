@@ -9,49 +9,41 @@ const field =
   "w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-200";
 const label = "mb-1 block text-sm font-medium text-gray-700";
 
-const CATEGORY_OPTIONS: {
-  value: string;
-  label: string;
-  desc: string;
-  outsideAllowed: boolean;
-}[] = [
+const CATEGORY_OPTIONS: { value: string; label: string; desc: string }[] = [
   {
-    value: "general",
-    label: "General",
-    desc: "Any other community service.",
-    outsideAllowed: true,
+    value: "inside",
+    label: "Inside",
+    desc: "An NHS event that already happened that you forgot to log, or work with an NHS-partnered organization. No limit toward your goal.",
+  },
+  {
+    value: "outside",
+    label: "Outside",
+    desc: "Volunteering not organized by NHS that you did on your own. Requires a proof photo; only a limited number of outside hours count toward your goal.",
   },
   {
     value: "tutoring",
     label: "Tutoring",
     desc: "Tutoring another student — you can self-report it or attend an NHS tutoring event.",
-    outsideAllowed: true,
   },
   {
     value: "soup_kitchen",
     label: "Soup Kitchen",
-    desc: "Serving at a soup kitchen — an NHS event, or an outside one with photo proof.",
-    outsideAllowed: true,
+    desc: "Serving at an NHS soup kitchen event.",
   },
   {
     value: "gardening",
     label: "Gardening",
     desc: "In-school gardening only — these hours come from NHS gardening events.",
-    outsideAllowed: false,
   },
 ];
 
 export function ReportHoursForm() {
-  const [origin, setOrigin] = useState<"inside" | "outside">("inside");
-  const [category, setCategory] = useState("general");
+  const [category, setCategory] = useState("inside");
   const [preview, setPreview] = useState<string | null>(null);
 
+  // Only "outside" hours are outside (capped); everything else is inside.
+  const origin = category === "outside" ? "outside" : "inside";
   const selectedCategory = CATEGORY_OPTIONS.find((c) => c.value === category);
-
-  function onOriginChange(next: "inside" | "outside") {
-    setOrigin(next);
-    if (next === "outside" && category === "gardening") setCategory("general");
-  }
 
   function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -59,53 +51,9 @@ export function ReportHoursForm() {
     setPreview(file ? URL.createObjectURL(file) : null);
   }
 
-  const originCard = (checked: boolean) =>
-    `block cursor-pointer rounded-lg border px-4 py-3 text-sm transition ${
-      checked
-        ? "border-primary-700 bg-primary-50 ring-2 ring-primary-200"
-        : "border-gray-300 hover:border-gray-400"
-    }`;
-
   return (
     <form action={reportHoursAction} className="rounded-xl bg-white p-6 shadow-sm">
       <div className="space-y-4">
-        <div>
-          <span className={label}>Where were these hours from?</span>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className={originCard(origin === "inside")}>
-              <input
-                type="radio"
-                name="origin"
-                value="inside"
-                checked={origin === "inside"}
-                onChange={() => onOriginChange("inside")}
-                className="sr-only"
-              />
-              <span className="font-semibold text-gray-900">Inside NHS</span>
-              <span className="mt-1 block text-xs leading-relaxed text-gray-500">
-                An NHS event that already happened that you forgot to log, or work
-                with an NHS-partnered organization.
-              </span>
-            </label>
-            <label className={originCard(origin === "outside")}>
-              <input
-                type="radio"
-                name="origin"
-                value="outside"
-                checked={origin === "outside"}
-                onChange={() => onOriginChange("outside")}
-                className="sr-only"
-              />
-              <span className="font-semibold text-gray-900">Outside NHS</span>
-              <span className="mt-1 block text-xs leading-relaxed text-gray-500">
-                Volunteering not organized by NHS that you went and did on your own.
-                Requires a proof photo; only some outside hours count toward your
-                goal.
-              </span>
-            </label>
-          </div>
-        </div>
-
         <div>
           <label htmlFor="category" className={label}>
             Type of hours
@@ -117,9 +65,7 @@ export function ReportHoursForm() {
             onChange={(e) => setCategory(e.target.value)}
             className={field}
           >
-            {CATEGORY_OPTIONS.filter(
-              (c) => origin === "inside" || c.outsideAllowed,
-            ).map((c) => (
+            {CATEGORY_OPTIONS.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
               </option>

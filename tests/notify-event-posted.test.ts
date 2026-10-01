@@ -3,13 +3,14 @@ import { db } from "@/lib/db";
 import { truncateAll } from "./helpers/db";
 import { hashPassword } from "@/lib/services/auth-service";
 import { notifyEventPosted } from "@/lib/email/notify";
-import { sendMail } from "@/lib/email/mailer";
+import { sendMailBatch } from "@/lib/email/mailer";
 
 vi.mock("@/lib/email/mailer", () => ({
   sendMail: vi.fn().mockResolvedValue(true),
+  sendMailBatch: vi.fn().mockResolvedValue({ unconfigured: false, sent: 1, failed: [] }),
 }));
 
-const sendMailMock = vi.mocked(sendMail);
+const sendMailMock = vi.mocked(sendMailBatch);
 
 async function seedVerifiedMember() {
   return db.user.create({
@@ -50,7 +51,7 @@ describe("notifyEventPosted", () => {
     await notifyEventPosted({ title: "Cleanup", slots: [SLOT_A] });
 
     expect(sendMailMock).toHaveBeenCalledTimes(1);
-    const arg = sendMailMock.mock.calls[0][0] as { html?: string; text?: string };
+    const arg = sendMailMock.mock.calls[0][1] as { html?: string; text?: string };
     const body = `${arg.html ?? ""}${arg.text ?? ""}`;
     expect(body).toContain("09:00");
   });
@@ -61,7 +62,7 @@ describe("notifyEventPosted", () => {
     await notifyEventPosted({ title: "Cleanup", slots: [SLOT_A, SLOT_B] });
 
     expect(sendMailMock).toHaveBeenCalledTimes(1);
-    const arg = sendMailMock.mock.calls[0][0] as { html?: string; text?: string };
+    const arg = sendMailMock.mock.calls[0][1] as { html?: string; text?: string };
     const body = `${arg.html ?? ""}${arg.text ?? ""}`;
     expect(body).toContain("2 timeslots");
   });

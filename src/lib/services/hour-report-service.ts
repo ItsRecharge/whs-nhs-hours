@@ -18,7 +18,7 @@ export async function createReport(input: {
       notes: input.notes ?? null,
       date: input.date,
       hoursRequested: input.hoursRequested,
-      category: input.category ?? "general",
+      category: input.category ?? "inside",
       origin: input.origin ?? "inside",
       photoPath: input.photoPath ?? null,
       status: "pending",

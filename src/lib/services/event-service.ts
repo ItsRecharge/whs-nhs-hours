@@ -16,7 +16,7 @@ function eventData(input: CreateEventInput) {
     title: input.title,
     description: input.description ?? null,
     location: input.location ?? null,
-    category: input.category ?? "general",
+    category: input.category ?? "inside",
     timeslots: {
       create: input.slots.map((s) => ({
         date: s.date,

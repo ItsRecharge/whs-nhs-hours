@@ -68,39 +68,31 @@ describe("hourReportSchema category/origin rules", () => {
     hoursRequested: "2",
   };
 
-  it("accepts an outside soup-kitchen report", () => {
-    const parsed = hourReportSchema.safeParse({
-      ...base,
-      category: "soup_kitchen",
-      origin: "outside",
-    });
-    expect(parsed.success).toBe(true);
-  });
+  const originFor = (category?: string) => {
+    const parsed = hourReportSchema.safeParse({ ...base, category });
+    if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+    return parsed.data;
+  };
 
-  it("rejects outside gardening (in-school only)", () => {
-    const parsed = hourReportSchema.safeParse({
-      ...base,
-      category: "gardening",
-      origin: "outside",
-    });
-    expect(parsed.success).toBe(false);
-  });
-
-  it("allows inside gardening reports (forgot-to-log NHS event)", () => {
-    const parsed = hourReportSchema.safeParse({
-      ...base,
-      category: "gardening",
-      origin: "inside",
-    });
-    expect(parsed.success).toBe(true);
-  });
-
-  it("defaults to general/inside", () => {
-    const parsed = hourReportSchema.safeParse(base);
-    expect(parsed.success).toBe(true);
-    if (parsed.success) {
-      expect(parsed.data.category).toBe("general");
-      expect(parsed.data.origin).toBe("inside");
+  it("derives outside origin only from the outside category", () => {
+    expect(originFor("outside").origin).toBe("outside");
+    for (const c of ["inside", "tutoring", "soup_kitchen", "gardening"]) {
+      expect(originFor(c).origin).toBe("inside");
     }
+  });
+
+  it("ignores a submitted origin field", () => {
+    const parsed = hourReportSchema.safeParse({ ...base, category: "tutoring", origin: "outside" });
+    expect(parsed.success && parsed.data.origin).toBe("inside");
+  });
+
+  it("rejects the removed general category", () => {
+    expect(hourReportSchema.safeParse({ ...base, category: "general" }).success).toBe(false);
+  });
+
+  it("defaults to inside", () => {
+    const data = originFor(undefined);
+    expect(data.category).toBe("inside");
+    expect(data.origin).toBe("inside");
   });
 });

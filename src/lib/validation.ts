@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { HOUR_CATEGORIES, HOUR_ORIGINS, ROLES, STUDENT_EMAIL_DOMAIN } from "./constants";
+import {
+  EVENT_CATEGORIES,
+  HOUR_CATEGORIES,
+  ROLES,
+  STUDENT_EMAIL_DOMAIN,
+  type HourOrigin,
+} from "./constants";
 
 export const emailSchema = z
   .string()
@@ -87,7 +93,7 @@ const baseEvent = {
   title: z.string().trim().min(1, "Title is required").max(120),
   description: z.string().trim().max(2000).optional(),
   location: z.string().trim().max(200).optional(),
-  category: z.enum(HOUR_CATEGORIES).default("general"),
+  category: z.enum(EVENT_CATEGORIES as [string, ...string[]]).default("inside"),
 };
 
 /** Officer event creation: one or more timeslots. */
@@ -111,19 +117,13 @@ export const hourReportSchema = z
       .number()
       .min(0.5, "At least 0.5 hours")
       .max(24, "At most 24 hours"),
-    category: z.enum(HOUR_CATEGORIES).default("general"),
-    origin: z.enum(HOUR_ORIGINS).default("inside"),
+    category: z.enum(HOUR_CATEGORIES).default("inside"),
   })
-  .superRefine((r, ctx) => {
-    if (r.origin === "outside" && r.category === "gardening") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["category"],
-        message:
-          "Gardening hours are in-school only — they must come from NHS events.",
-      });
-    }
-  });
+  // Origin drives the outside-hours cap; it follows from the category.
+  .transform((r) => ({
+    ...r,
+    origin: (r.category === "outside" ? "outside" : "inside") as HourOrigin,
+  }));
 
 export const inviteSchema = z.object({
   expiresInDays: z.coerce.number().int().min(1).max(365),

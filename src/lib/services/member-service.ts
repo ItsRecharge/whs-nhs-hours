@@ -30,7 +30,7 @@ function emptyByCategory(): Record<HourCategory, number> {
 function asCategory(raw: string): HourCategory {
   return (HOUR_CATEGORIES as readonly string[]).includes(raw)
     ? (raw as HourCategory)
-    : "general";
+    : "inside";
 }
 
 interface CreditRow {

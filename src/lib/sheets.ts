@@ -40,7 +40,7 @@ export interface HoursRow {
   source: string; // e.g. "Event: Spring Concert"
   date: Date;
   recordedBy?: string; // officer/organizer who credited the hours
-  category?: string; // general | tutoring | soup_kitchen | gardening
+  category?: string; // inside | outside | tutoring | soup_kitchen | gardening
   origin?: string; // inside | outside
 }
 
@@ -162,7 +162,7 @@ export async function appendHoursRows(rows: HoursRow[]): Promise<void> {
             r.source,
             r.date.toISOString().slice(0, 10),
             r.recordedBy ?? "",
-            r.category ?? "general",
+            r.category ?? "inside",
             r.origin ?? "inside",
           ]),
         },

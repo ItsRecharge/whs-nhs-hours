@@ -108,7 +108,7 @@ export default async function OfficerRequestsPage() {
                         {r.origin === "outside" ? "Outside NHS" : "Inside NHS"}
                       </span>
                       <span className="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700">
-                        {HOUR_CATEGORY_LABELS[r.category as HourCategory] ?? "General"}
+                        {HOUR_CATEGORY_LABELS[r.category as HourCategory] ?? "Inside"}
                       </span>
                     </p>
                     {r.notes && (

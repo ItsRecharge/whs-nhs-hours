@@ -4,16 +4,25 @@
 export const ROLES = ["member", "officer", "organizer"] as const;
 export type Role = (typeof ROLES)[number];
 
+// "outside" is the only category that counts as outside hours (capped by
+// ChapterSettings.outsideHoursCap); every other category is inside.
 export const HOUR_CATEGORIES = [
-  "general",
+  "inside",
+  "outside",
   "tutoring",
   "soup_kitchen",
   "gardening",
 ] as const;
 export type HourCategory = (typeof HOUR_CATEGORIES)[number];
 
+/** NHS events are always inside hours. */
+export const EVENT_CATEGORIES = HOUR_CATEGORIES.filter(
+  (c): c is Exclude<HourCategory, "outside"> => c !== "outside",
+);
+
 export const HOUR_CATEGORY_LABELS: Record<HourCategory, string> = {
-  general: "General",
+  inside: "Inside",
+  outside: "Outside",
   tutoring: "Tutoring",
   soup_kitchen: "Soup Kitchen",
   gardening: "Gardening",

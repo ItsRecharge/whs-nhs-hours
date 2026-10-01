@@ -172,7 +172,7 @@ describe("attendance crediting", () => {
         userId: members[0].id,
         hours: 3,
         eventTitle: "Festival",
-        eventCategory: "general",
+        eventCategory: "inside",
       },
     ]);
 

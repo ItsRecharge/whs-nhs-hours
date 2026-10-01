@@ -1,5 +1,5 @@
 import { SubmitButton } from "@/components/SubmitButton";
-import { HOUR_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
+import { EVENT_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
 import { SlotRows } from "./SlotRows";
 
 const field =
@@ -13,7 +13,7 @@ const label = "mb-1 block text-sm font-medium text-gray-700";
 export function EventFormFields({
   submitLabel,
   allowMultipleSlots = true,
-  defaultCategory = "general",
+  defaultCategory = "inside",
 }: {
   submitLabel: string;
   allowMultipleSlots?: boolean;
@@ -37,7 +37,7 @@ export function EventFormFields({
           defaultValue={defaultCategory}
           className={field}
         >
-          {HOUR_CATEGORIES.map((c) => (
+          {EVENT_CATEGORIES.map((c) => (
             <option key={c} value={c}>
               {HOUR_CATEGORY_LABELS[c]}
             </option>

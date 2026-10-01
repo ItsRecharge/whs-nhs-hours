@@ -13,7 +13,7 @@ import { listOrganizers } from "@/lib/services/organizer-service";
 import { db } from "@/lib/db";
 import { SlotRows } from "@/components/forms/SlotRows";
 import { SubmitButton } from "@/components/SubmitButton";
-import { HOUR_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
+import { EVENT_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
 
 const field =
   "w-full rounded-md border border-gray-300 px-2.5 py-1.5 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200";
@@ -79,7 +79,7 @@ export default async function EditEventPage({
             defaultValue={event.category}
             className={field}
           >
-            {HOUR_CATEGORIES.map((c) => (
+            {EVENT_CATEGORIES.map((c) => (
               <option key={c} value={c}>
                 {HOUR_CATEGORY_LABELS[c]}
               </option>

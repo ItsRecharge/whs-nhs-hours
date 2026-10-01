@@ -38,7 +38,7 @@ export default async function ReportHoursPage() {
                   <p className="font-medium text-gray-900">{r.description}</p>
                   <p className="text-sm text-gray-500">
                     {formatEventDate(r.date)} · {r.hoursRequested} hrs ·{" "}
-                    {HOUR_CATEGORY_LABELS[r.category as HourCategory] ?? "General"} ·{" "}
+                    {HOUR_CATEGORY_LABELS[r.category as HourCategory] ?? "Inside"} ·{" "}
                     {r.origin === "outside" ? "Outside" : "Inside"}
                   </p>
                 </div>

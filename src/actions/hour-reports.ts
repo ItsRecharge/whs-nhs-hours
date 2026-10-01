@@ -27,7 +27,6 @@ export async function reportHoursAction(formData: FormData): Promise<void> {
     date: formData.get("date"),
     hoursRequested: formData.get("hoursRequested"),
     category: formData.get("category"),
-    origin: formData.get("origin"),
   });
   if (!parsed.success) {
     await setFlash("danger", parsed.error.issues[0].message);

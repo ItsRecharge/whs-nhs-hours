@@ -53,7 +53,7 @@ model Event {
   description  String?
   location     String?
   status       String   @default("active") // "active" | "completed" | "pending_approval" | "cancelled"
-  category     String   @default("general") // "general" | "tutoring" | "soup_kitchen" | "gardening"
+  category     String   @default("inside") // events are always inside: "inside" | "tutoring" | "soup_kitchen" | "gardening"
   createdById  Int? // null once the creating account is deleted; the event survives
   approvedById Int?
   createdAt    DateTime @default(now())
@@ -107,7 +107,7 @@ model HourReport {
   notes          String?
   date           DateTime // UTC midnight; the activity date
   hoursRequested Float
-  category       String    @default("general") // "general" | "tutoring" | "soup_kitchen" | "gardening"
+  category       String    @default("inside") // "inside" | "outside" | "tutoring" | "soup_kitchen" | "gardening"
   origin         String    @default("inside") // "inside" (NHS-organized) | "outside" (self-arranged)
   photoPath      String? // proof photo, relative path under the uploads dir
   status         String    @default("pending") // "pending" | "approved" | "denied"

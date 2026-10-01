@@ -14,7 +14,7 @@ export interface HistoryEntry {
 function asCategory(raw: string): HourCategory {
   return (HOUR_CATEGORIES as readonly string[]).includes(raw)
     ? (raw as HourCategory)
-    : "general";
+    : "inside";
 }
 
 /**

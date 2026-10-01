@@ -3,7 +3,7 @@ import { fullName } from "@/lib/current-user";
 import { hoursEarnedForUser } from "@/lib/services/member-service";
 import { getPublicBaseUrl, getTotalGoal } from "@/lib/services/chapter-service";
 import { hoursRemaining, schoolYearRange } from "@/lib/hours";
-import { sendMail } from "./mailer";
+import { sendMail, sendMailBatch, sendMailEach } from "./mailer";
 import {
   eventCancelledEmail,
   eventPostedEmail,
@@ -14,14 +14,6 @@ import {
   requestDecisionEmail,
   waitlistPromotedEmail,
 } from "./templates";
-
-const BCC_CHUNK = 80; // stay well under Gmail's ~500 recipients/day per blast
-
-function chunk<T>(arr: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-}
 
 /** Email failures must never break the triggering request. */
 async function safeSend(fn: () => Promise<unknown>): Promise<void> {
@@ -64,9 +56,7 @@ export async function notifyEventPosted(event: {
         ? `${dateLabel(event.slots[0].date)}, ${event.slots[0].startTime}–${event.slots[0].endTime}`
         : `${event.slots.length} timeslots starting ${dateLabel(event.slots[0].date)}`;
     const content = eventPostedEmail(event.title, whenLabel, await getPublicBaseUrl());
-    for (const group of chunk(recipients, BCC_CHUNK)) {
-      await sendMail({ bcc: group, ...content });
-    }
+    await sendMailBatch(recipients, content);
   });
 }
 
@@ -104,7 +94,7 @@ export async function notifyHoursCredited(
 /**
  * Officer-triggered: emails every verified, active member a personalized hours
  * summary (earned / remaining vs the chapter goal) as an end-of-year reminder.
- * Each send is isolated so one bad address doesn't abort the batch.
+ * Sent over one connection; one bad address doesn't abort the batch.
  */
 export async function notifyHoursSummary(): Promise<void> {
   await safeSend(async () => {
@@ -122,24 +112,22 @@ export async function notifyHoursSummary(): Promise<void> {
     });
     const baseUrl = await getPublicBaseUrl();
 
+    const messages = [];
     for (const m of members) {
-      try {
-        const earned = await hoursEarnedForUser(m.id);
-        await sendMail({
-          to: m.email,
-          ...hoursSummaryEmail(
-            fullName(m),
-            earned,
-            hoursRemaining(earned, goal),
-            goal,
-            deadline,
-            baseUrl,
-          ),
-        });
-      } catch (err) {
-        console.error(`[notify] hours summary to ${m.email} failed:`, err);
-      }
+      const earned = await hoursEarnedForUser(m.id);
+      messages.push({
+        to: m.email,
+        ...hoursSummaryEmail(
+          fullName(m),
+          earned,
+          hoursRemaining(earned, goal),
+          goal,
+          deadline,
+          baseUrl,
+        ),
+      });
     }
+    await sendMailEach(messages);
   });
 }
 
@@ -151,9 +139,7 @@ export async function notifyNewRequest(
     const recipients = await verifiedEmailsByRole("officer");
     if (recipients.length === 0) return;
     const content = newRequestEmail(eventTitle, requesterName, await getPublicBaseUrl());
-    for (const group of chunk(recipients, BCC_CHUNK)) {
-      await sendMail({ bcc: group, ...content });
-    }
+    await sendMailBatch(recipients, content);
   });
 }
 
@@ -170,9 +156,7 @@ export async function notifyEventCancelled(
     const emails = users.map((u) => u.email);
     if (emails.length === 0) return;
     const content = eventCancelledEmail(eventTitle, await getPublicBaseUrl());
-    for (const group of chunk(emails, BCC_CHUNK)) {
-      await sendMail({ bcc: group, ...content });
-    }
+    await sendMailBatch(emails, content);
   });
 }
 
