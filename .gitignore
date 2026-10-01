@@ -30,4 +30,4 @@ coverage/
 tests/.tmp/
 
 # uploads (hour-report proof photos)
-uploads/
+/uploads/
