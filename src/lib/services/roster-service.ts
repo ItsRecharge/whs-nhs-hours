@@ -1,7 +1,7 @@
 import type { HourReport } from "@prisma/client";
 import { db } from "../db";
 import { revokeAllUserSessions } from "./session-service";
-import type { Role } from "../constants";
+import type { HourCategory, Role } from "../constants";
 import { isBootstrapProtected } from "./bootstrap-service";
 
 export interface OfficerRow {
@@ -51,12 +51,14 @@ async function assertBootstrapOfficerEditable(userId: number): Promise<void> {
 /**
  * Records an officer hours adjustment as a pre-approved HourReport. `hours` may
  * be negative to deduct hours; it flows through the normal earned-hours sum.
+ * It lands in `category`; only "outside" counts as outside hours.
  */
 export async function createAdjustment(input: {
   userId: number;
   description: string;
   date: Date;
   hours: number;
+  category: HourCategory;
   officerId: number;
 }): Promise<HourReport> {
   return db.hourReport.create({
@@ -65,6 +67,8 @@ export async function createAdjustment(input: {
       description: input.description,
       date: input.date,
       hoursRequested: input.hours,
+      category: input.category,
+      origin: input.category === "outside" ? "outside" : "inside",
       status: "approved",
       reviewedById: input.officerId,
       reviewedAt: new Date(),

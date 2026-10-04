@@ -8,7 +8,10 @@ import {
   setMemberActive,
   setMemberRole,
 } from "@/lib/services/roster-service";
-import { hoursEarnedForUser } from "@/lib/services/member-service";
+import {
+  hoursBreakdownForUser,
+  hoursEarnedForUser,
+} from "@/lib/services/member-service";
 import {
   cancelEvent,
   cancelOwnRequest,
@@ -85,6 +88,7 @@ describe("hour adjustments", () => {
       description: "Bonus",
       date: new Date(`${inYear()}T00:00:00.000Z`),
       hours: 3,
+      category: "inside",
       officerId: officer.id,
     });
     expect(await hoursEarnedForUser(member.id)).toBe(3);
@@ -93,9 +97,37 @@ describe("hour adjustments", () => {
       description: "Correction",
       date: new Date(`${inYear()}T00:00:00.000Z`),
       hours: -1,
+      category: "inside",
       officerId: officer.id,
     });
     expect(await hoursEarnedForUser(member.id)).toBe(2);
+  });
+
+  it("files an adjustment under its category, outside counting as outside", async () => {
+    const officer = await makeOfficer();
+    const member = await makeMember();
+    const date = new Date(`${inYear()}T00:00:00.000Z`);
+    await createAdjustment({
+      userId: member.id,
+      description: "Tutoring credit",
+      date,
+      hours: 2,
+      category: "tutoring",
+      officerId: officer.id,
+    });
+    await createAdjustment({
+      userId: member.id,
+      description: "Outside correction",
+      date,
+      hours: 3,
+      category: "outside",
+      officerId: officer.id,
+    });
+    const b = await hoursBreakdownForUser(member.id);
+    expect(b.byCategory.tutoring).toBe(2);
+    expect(b.byCategory.outside).toBe(3);
+    expect(b.outside).toBe(3);
+    expect(b.inside).toBe(2);
   });
 });
 

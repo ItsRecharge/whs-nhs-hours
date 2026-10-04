@@ -23,7 +23,7 @@ import {
 } from "@/lib/services/house-service";
 import { graduatedSeniorInfo } from "@/lib/services/member-service";
 import { setFlash } from "@/lib/flash";
-import type { Role } from "@/lib/constants";
+import { HOUR_CATEGORY_LABELS, type Role } from "@/lib/constants";
 
 function memberPath(id: number) {
   return `/officer/members/${id}`;
@@ -45,6 +45,7 @@ export async function adjustHoursAction(formData: FormData): Promise<void> {
     description: formData.get("description"),
     date: formData.get("date"),
     hours: formData.get("hours"),
+    category: formData.get("category"),
   });
   if (!parsed.success) {
     await setFlash("danger", parsed.error.issues[0].message);
@@ -56,6 +57,7 @@ export async function adjustHoursAction(formData: FormData): Promise<void> {
     description: parsed.data.description,
     date: parsed.data.date,
     hours: parsed.data.hours,
+    category: parsed.data.category,
     officerId: officer.id,
   });
   const member = await db.user.findUnique({
@@ -74,6 +76,8 @@ export async function adjustHoursAction(formData: FormData): Promise<void> {
               source: `Adjustment: ${adjustment.description}`,
               date: adjustment.date,
               recordedBy: fullName(officer),
+              category: adjustment.category,
+              origin: adjustment.category === "outside" ? "outside" : "inside",
             },
           ]
         : undefined,
@@ -82,13 +86,13 @@ export async function adjustHoursAction(formData: FormData): Promise<void> {
   await recordAudit({
     actor: officer,
     action: "roster.adjustHours",
-    summary: `Adjusted ${await targetName(userId)} by ${parsed.data.hours > 0 ? "+" : ""}${parsed.data.hours} hrs ("${parsed.data.description}")`,
+    summary: `Adjusted ${await targetName(userId)} by ${parsed.data.hours > 0 ? "+" : ""}${parsed.data.hours} hrs ${HOUR_CATEGORY_LABELS[parsed.data.category]} ("${parsed.data.description}")`,
     targetType: "user",
     targetId: userId,
   });
   await setFlash(
     "success",
-    `${parsed.data.hours > 0 ? "Added" : "Deducted"} ${Math.abs(parsed.data.hours)} hrs.`,
+    `${parsed.data.hours > 0 ? "Added" : "Deducted"} ${Math.abs(parsed.data.hours)} ${HOUR_CATEGORY_LABELS[parsed.data.category]} hrs.`,
   );
   revalidatePath(memberPath(userId));
   redirect(memberPath(userId));

@@ -203,6 +203,7 @@ export const adjustHoursSchema = z.object({
     .number()
     .refine((n) => n !== 0, "Hours can't be zero")
     .refine((n) => Math.abs(n) <= 100, "That's too many hours"),
+  category: z.enum(HOUR_CATEGORIES, { message: "Pick a type of hours" }),
 });
 
 /** True when `email` (already lowercased) belongs to the student school domain. */

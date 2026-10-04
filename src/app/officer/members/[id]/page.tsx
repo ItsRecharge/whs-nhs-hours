@@ -8,7 +8,7 @@ import { hoursHistoryForUser } from "@/lib/services/history-service";
 import { getTotalGoal } from "@/lib/services/chapter-service";
 import { listHouses } from "@/lib/services/house-service";
 import { hoursRemaining } from "@/lib/hours";
-import { HOUR_CATEGORY_LABELS } from "@/lib/constants";
+import { HOUR_CATEGORIES, HOUR_CATEGORY_LABELS } from "@/lib/constants";
 import { isBootstrapProtected } from "@/lib/services/bootstrap-service";
 import { ProgressBar } from "@/components/ProgressBar";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -129,10 +129,23 @@ export default async function MemberDetailPage({
       <section className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">Adjust hours</h2>
         <p className="mb-4 text-sm text-gray-500">
-          Add a correction directly. Use a negative number to deduct hours.
+          Add a correction directly to one type of hours. Use a negative number
+          to deduct hours.
         </p>
         <form action={adjustHoursAction} className="space-y-4">
           <input type="hidden" name="userId" value={member.id} />
+          <div>
+            <label htmlFor="category" className={label}>
+              Type of hours
+            </label>
+            <select id="category" name="category" defaultValue="inside" className={field}>
+              {HOUR_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {HOUR_CATEGORY_LABELS[c]}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label htmlFor="description" className={label}>
               Reason
