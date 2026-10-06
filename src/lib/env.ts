@@ -8,7 +8,7 @@ const envSchema = z.object({
   APP_URL: z.string().url().default("http://localhost:3000"),
   OPS_CONSOLE_ENABLED: z.string().optional(),
   OPS_ADMIN_EMAILS: z.string().optional(),
-  NHS_TEST_MODE: z.string().optional(), // local only; see lib/test-mode.ts
+  NHS_TEST_MODE: z.string().optional(), // see lib/test-mode.ts
 
   // Optional groups — features degrade to no-ops when unset
   GMAIL_USER: z.string().optional(),

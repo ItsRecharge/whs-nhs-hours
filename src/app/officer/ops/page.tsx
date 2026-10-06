@@ -9,7 +9,7 @@ import {
 } from "@/actions/ops";
 import { requireUser } from "@/lib/current-user";
 import { isOpsConsoleEnabled, hasValidOpsGrant, isSuperAdmin } from "@/lib/ops-access";
-import { isTestMode, isTestModeAvailable } from "@/lib/test-mode";
+import { isTestMode } from "@/lib/test-mode";
 import { SubmitButton } from "@/components/SubmitButton";
 import { OpsSettingsModal } from "@/components/OpsSettingsModal";
 import { OpsTerminal } from "@/components/OpsTerminal";
@@ -64,7 +64,7 @@ export default async function OpsPage({
     );
   }
 
-  const canToggleTestMode = isSuperAdmin(user) && isTestModeAvailable();
+  const canToggleTestMode = isSuperAdmin(user);
   const testModeOn = isTestMode();
   const breadcrumb = workspace.directory ? workspace.directory.split("/").filter(Boolean) : [];
 

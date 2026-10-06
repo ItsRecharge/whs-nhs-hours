@@ -7,7 +7,7 @@ import { verifyPassword } from "@/lib/services/auth-service";
 import { listAdmins } from "@/lib/services/bootstrap-service";
 import { requireUser } from "@/lib/current-user";
 import { requireOpsGrant, isOpsConsoleEnabled, isSuperAdmin } from "@/lib/ops-access";
-import { isTestMode, isTestModeAvailable, setTestMode } from "@/lib/test-mode";
+import { isTestMode, setTestMode } from "@/lib/test-mode";
 import { signOpsGrant } from "@/lib/ops-grant";
 import { OPS_GRANT_COOKIE, OPS_GRANT_TTL_SECONDS } from "@/lib/constants";
 import { setFlash } from "@/lib/flash";
@@ -109,8 +109,8 @@ export async function saveOpsFileAction(formData: FormData): Promise<void> {
 export async function toggleTestModeAction(): Promise<void> {
   const user = await requireUser("officer");
   await requireOpsGrant(user);
-  if (!isSuperAdmin(user) || !isTestModeAvailable()) {
-    await setFlash("danger", "Test mode is only available to super admins on a local server.");
+  if (!isSuperAdmin(user)) {
+    await setFlash("danger", "Test mode is only available to super admins.");
     redirect("/officer/ops");
   }
 

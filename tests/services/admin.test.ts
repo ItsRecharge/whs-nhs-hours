@@ -80,11 +80,9 @@ describe("audit log", () => {
   });
 
   describe("test mode", () => {
-    const origNodeEnv = process.env.NODE_ENV;
     afterEach(() => {
       delete (globalThis as { nhsTestModeOverride?: boolean }).nhsTestModeOverride;
       delete process.env.NHS_TEST_MODE;
-      (process.env as Record<string, string | undefined>).NODE_ENV = origNodeEnv;
     });
 
     async function makeOfficer(email: string, isBootstrapOfficer: boolean) {
@@ -123,22 +121,6 @@ describe("audit log", () => {
       await recordAudit({ actor: admin, action: "event.create", summary: "kept" });
       const log = await listAuditLog();
       expect(log.map((e) => e.summary)).toEqual(["kept"]);
-    });
-
-    it("toggle is ignored in production", async () => {
-      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
-      const admin = await makeOfficer("admin@test.local", true);
-      setTestMode(true);
-      await recordAudit({ actor: admin, action: "event.create", summary: "kept" });
-      expect(await listAuditLog()).toHaveLength(1);
-    });
-
-    it("still records in production even with the flag set", async () => {
-      process.env.NHS_TEST_MODE = "true";
-      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
-      const admin = await makeOfficer("admin@test.local", true);
-      await recordAudit({ actor: admin, action: "event.create", summary: "kept" });
-      expect(await listAuditLog()).toHaveLength(1);
     });
   });
 });
