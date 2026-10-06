@@ -1,6 +1,8 @@
 import type { User } from "@prisma/client";
 import { db } from "../db";
 import { fullName } from "../current-user";
+import { isTestMode } from "../test-mode";
+import { isSuperAdmin } from "../ops-access";
 
 export interface AuditInput {
   actor: Pick<User, "id" | "firstName" | "lastName">;
@@ -13,6 +15,14 @@ export interface AuditInput {
 /** Records an officer action. Never throws into the caller. */
 export async function recordAudit(input: AuditInput): Promise<void> {
   try {
+    // Local test mode: a super admin's own edits are not logged.
+    if (isTestMode()) {
+      const actor = await db.user.findUnique({
+        where: { id: input.actor.id },
+        select: { email: true, isBootstrapOfficer: true },
+      });
+      if (actor && isSuperAdmin(actor)) return;
+    }
     await db.auditLog.create({
       data: {
         actorId: input.actor.id,

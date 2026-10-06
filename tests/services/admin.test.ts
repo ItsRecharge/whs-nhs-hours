@@ -77,6 +77,50 @@ describe("audit log", () => {
     expect(log[0].actorName).toBe("Pat Officer");
     expect(log).toHaveLength(2);
   });
+
+  describe("test mode", () => {
+    const origNodeEnv = process.env.NODE_ENV;
+    afterEach(() => {
+      delete process.env.NHS_TEST_MODE;
+      (process.env as Record<string, string | undefined>).NODE_ENV = origNodeEnv;
+    });
+
+    async function makeOfficer(email: string, isBootstrapOfficer: boolean) {
+      return db.user.create({
+        data: {
+          firstName: "Pat",
+          lastName: "Officer",
+          email,
+          passwordHash: "x",
+          role: "officer",
+          isBootstrapOfficer,
+          emailVerifiedAt: new Date(),
+        },
+      });
+    }
+
+    it("skips a super admin's edits when NHS_TEST_MODE=true", async () => {
+      process.env.NHS_TEST_MODE = "true";
+      const admin = await makeOfficer("admin@test.local", true);
+      await recordAudit({ actor: admin, action: "event.create", summary: "hidden" });
+      expect(await listAuditLog()).toHaveLength(0);
+    });
+
+    it("still records a regular officer's edits in test mode", async () => {
+      process.env.NHS_TEST_MODE = "true";
+      const officer = await makeOfficer("officer@test.local", false);
+      await recordAudit({ actor: officer, action: "event.create", summary: "kept" });
+      expect(await listAuditLog()).toHaveLength(1);
+    });
+
+    it("still records in production even with the flag set", async () => {
+      process.env.NHS_TEST_MODE = "true";
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+      const admin = await makeOfficer("admin@test.local", true);
+      await recordAudit({ actor: admin, action: "event.create", summary: "kept" });
+      expect(await listAuditLog()).toHaveLength(1);
+    });
+  });
 });
 
 describe("year-end reset", () => {
