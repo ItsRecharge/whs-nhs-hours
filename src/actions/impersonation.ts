@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { requireUser, fullName } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { createSession } from "@/lib/session";
+import { verifySessionToken } from "@/lib/session-token";
+import { validateSession } from "@/lib/services/session-service";
 import { setFlash } from "@/lib/flash";
 import {
   IMPERSONATOR_COOKIE,
@@ -17,6 +19,22 @@ const OFFICERS_PATH = "/officer/officers";
 
 function homeFor(role: string): string {
   return role === "officer" ? "/officer/dashboard" : "/member/dashboard";
+}
+
+/**
+ * The stashed token only means "impersonating" if it's a live session for someone
+ * other than the current user. Anything else (expired, revoked, or the admin's own
+ * session left behind after logging back in) is stale and gets overwritten.
+ */
+async function impersonationActive(
+  saved: string | undefined,
+  currentUserId: number,
+): Promise<boolean> {
+  if (!saved) return false;
+  const claims = await verifySessionToken(saved);
+  if (!claims) return false;
+  const session = await validateSession(claims.sid, claims.secret);
+  return !!session && session.userId !== currentUserId;
 }
 
 /**
@@ -33,7 +51,7 @@ export async function startImpersonationAction(formData: FormData): Promise<void
   }
 
   const jar = await cookies();
-  if (jar.get(IMPERSONATOR_COOKIE)) {
+  if (await impersonationActive(jar.get(IMPERSONATOR_COOKIE)?.value, admin.id)) {
     await setFlash("warning", "Log out of your current impersonation first.");
     redirect(OFFICERS_PATH);
   }

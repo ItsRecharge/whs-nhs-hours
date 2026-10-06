@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { loginSchema } from "@/lib/validation";
 import { verifyCredentials } from "@/lib/services/auth-service";
@@ -9,7 +10,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { requestIp } from "@/lib/request-ip";
 import { fullName, getCurrentUser } from "@/lib/current-user";
 import { endImpersonationIfActive } from "@/lib/impersonation";
-import type { Role } from "@/lib/constants";
+import { IMPERSONATOR_COOKIE, type Role } from "@/lib/constants";
 
 export interface AuthFormState {
   error?: string;
@@ -48,6 +49,9 @@ export async function loginAction(
     return { error: "Invalid email or password." };
   }
 
+  // A fresh login ends any leftover impersonation; otherwise a stale stashed
+  // token would block the next "Impersonate" click.
+  (await cookies()).delete(IMPERSONATOR_COOKIE);
   await createSession({
     userId: result.user.id,
     role: result.user.role as Role,
