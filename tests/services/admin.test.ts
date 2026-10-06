@@ -9,6 +9,7 @@ import {
   updateSheetsConfig,
 } from "@/lib/services/integration-service";
 import { recordAudit, listAuditLog } from "@/lib/services/audit-service";
+import { setTestMode } from "@/lib/test-mode";
 import { resetSummary, runYearEndReset } from "@/lib/services/reset-service";
 import { createEvent } from "@/lib/services/event-service";
 import { signupForSlot } from "@/lib/services/slot-signup-service";
@@ -81,6 +82,7 @@ describe("audit log", () => {
   describe("test mode", () => {
     const origNodeEnv = process.env.NODE_ENV;
     afterEach(() => {
+      delete (globalThis as { nhsTestModeOverride?: boolean }).nhsTestModeOverride;
       delete process.env.NHS_TEST_MODE;
       (process.env as Record<string, string | undefined>).NODE_ENV = origNodeEnv;
     });
@@ -110,6 +112,24 @@ describe("audit log", () => {
       process.env.NHS_TEST_MODE = "true";
       const officer = await makeOfficer("officer@test.local", false);
       await recordAudit({ actor: officer, action: "event.create", summary: "kept" });
+      expect(await listAuditLog()).toHaveLength(1);
+    });
+
+    it("console toggle turns test mode on and off", async () => {
+      const admin = await makeOfficer("admin@test.local", true);
+      setTestMode(true);
+      await recordAudit({ actor: admin, action: "event.create", summary: "hidden" });
+      setTestMode(false);
+      await recordAudit({ actor: admin, action: "event.create", summary: "kept" });
+      const log = await listAuditLog();
+      expect(log.map((e) => e.summary)).toEqual(["kept"]);
+    });
+
+    it("toggle is ignored in production", async () => {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+      const admin = await makeOfficer("admin@test.local", true);
+      setTestMode(true);
+      await recordAudit({ actor: admin, action: "event.create", summary: "kept" });
       expect(await listAuditLog()).toHaveLength(1);
     });
 

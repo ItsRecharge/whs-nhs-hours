@@ -6,7 +6,8 @@ import { recordAudit } from "@/lib/services/audit-service";
 import { verifyPassword } from "@/lib/services/auth-service";
 import { listAdmins } from "@/lib/services/bootstrap-service";
 import { requireUser } from "@/lib/current-user";
-import { requireOpsGrant, isOpsConsoleEnabled } from "@/lib/ops-access";
+import { requireOpsGrant, isOpsConsoleEnabled, isSuperAdmin } from "@/lib/ops-access";
+import { isTestMode, isTestModeAvailable, setTestMode } from "@/lib/test-mode";
 import { signOpsGrant } from "@/lib/ops-grant";
 import { OPS_GRANT_COOKIE, OPS_GRANT_TTL_SECONDS } from "@/lib/constants";
 import { setFlash } from "@/lib/flash";
@@ -103,6 +104,28 @@ export async function saveOpsFileAction(formData: FormData): Promise<void> {
 
   await setFlash("success", `Saved ${path}.`);
   redirect(`/officer/ops?path=${encodeURIComponent(path)}`);
+}
+
+export async function toggleTestModeAction(): Promise<void> {
+  const user = await requireUser("officer");
+  await requireOpsGrant(user);
+  if (!isSuperAdmin(user) || !isTestModeAvailable()) {
+    await setFlash("danger", "Test mode is only available to super admins on a local server.");
+    redirect("/officer/ops");
+  }
+
+  // Log the switch itself while logging is still on (before enabling / after disabling).
+  const turningOn = !isTestMode();
+  if (turningOn) {
+    await recordAudit({ actor: user, action: "ops.test_mode.on", summary: "Turned on test mode" });
+    setTestMode(true);
+  } else {
+    setTestMode(false);
+    await recordAudit({ actor: user, action: "ops.test_mode.off", summary: "Turned off test mode" });
+  }
+
+  await setFlash("success", turningOn ? "Test mode on — your edits won't be audit-logged." : "Test mode off.");
+  redirect("/officer/ops");
 }
 
 export async function runOpsGitAction(formData: FormData): Promise<void> {

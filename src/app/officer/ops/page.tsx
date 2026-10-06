@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, FileText, Folder, GitBranch } from "lucide-react";
-import { requestOpsGrantAction, runOpsGitAction, saveOpsFileAction } from "@/actions/ops";
+import {
+  requestOpsGrantAction,
+  runOpsGitAction,
+  saveOpsFileAction,
+  toggleTestModeAction,
+} from "@/actions/ops";
 import { requireUser } from "@/lib/current-user";
-import { isOpsConsoleEnabled, hasValidOpsGrant } from "@/lib/ops-access";
+import { isOpsConsoleEnabled, hasValidOpsGrant, isSuperAdmin } from "@/lib/ops-access";
+import { isTestMode, isTestModeAvailable } from "@/lib/test-mode";
 import { SubmitButton } from "@/components/SubmitButton";
 import { OpsSettingsModal } from "@/components/OpsSettingsModal";
 import { OpsTerminal } from "@/components/OpsTerminal";
@@ -58,6 +64,8 @@ export default async function OpsPage({
     );
   }
 
+  const canToggleTestMode = isSuperAdmin(user) && isTestModeAvailable();
+  const testModeOn = isTestMode();
   const breadcrumb = workspace.directory ? workspace.directory.split("/").filter(Boolean) : [];
 
   return (
@@ -83,6 +91,16 @@ export default async function OpsPage({
               {head.branch || "unknown"} · {head.shortHead || "???????"}
             </div>
           </div>
+          {canToggleTestMode ? (
+            <form action={toggleTestModeAction}>
+              <SubmitButton
+                className={testModeOn ? "bg-amber-500 hover:bg-amber-600" : "bg-slate-700 hover:bg-slate-800"}
+                pendingText="Switching…"
+              >
+                {testModeOn ? "Test Mode: On" : "Test Mode: Off"}
+              </SubmitButton>
+            </form>
+          ) : null}
           <OpsSettingsModal />
         </div>
       </div>
